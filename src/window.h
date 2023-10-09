@@ -21,6 +21,8 @@ namespace KarhuRayTracer
 		void pollEvents();
 		bool shouldClose();
 		void swapBuffers();
+		GLFWwindow* getContext() { return glfwGetCurrentContext(); }
+		GLFWwindow* getWindow() const { return m_Window; }
 	private:
 		GLFWwindow* m_Window = nullptr;
 		uint32_t m_Width;

@@ -1,4 +1,5 @@
 #include "window.h"
+#include "imgui.h"
 #include <stdexcept>
 
 
@@ -40,6 +41,8 @@ namespace KarhuRayTracer
 		glViewport(0, 0, m_Width, m_Height);
 
 		glfwSetFramebufferSizeCallback(m_Window, framebuffer_size_callback);
+		IMGUI_CHECKVERSION();
+		ImGui::CreateContext();
 	}
 
 	void Window::pollEvents()

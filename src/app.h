@@ -21,6 +21,6 @@ namespace KarhuRayTracer
 		ImguiManager m_ImguiManager{ m_Window, m_Renderer };
 		Shader m_Shader{ "../shaders/VertexShader.vert","../shaders/FragmentShader.frag" };
 
-		
+		float timer;
 	};
 }

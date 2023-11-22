@@ -16,6 +16,7 @@ add_subdirectory("ext/imgui")
 
 include_directories(ext/glfw-3.3.8/include)
 include_directories("ext/imgui")
+include_directories("ext/stb-master")
 include_directories(${GLFW_SOURCE_DIR}/deps)
 set(GLAD_GL ${GLFW_SOURCE_DIR}/deps/glad/gl.h ${GLFW_SOURCE_DIR}/deps/glad_gl.c)
 

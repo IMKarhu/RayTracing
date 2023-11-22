@@ -88,4 +88,13 @@ namespace KarhuRayTracer
 	{
 		glUseProgram(m_ShaderProgram);
 	}
+	void Shader::setUniformVec4(const std::string& name, const glm::vec4& vec4)
+	{
+		int location = glGetUniformLocation(m_ShaderProgram, name.c_str());
+		if (location < 0)
+		{
+			return;
+		}
+		glUniform4f(location, vec4.x,vec4.y,vec4.z,vec4.w);
+	}
 }

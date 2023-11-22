@@ -19,5 +19,6 @@ namespace KarhuRayTracer
 		unsigned int m_EBO;
 		unsigned int m_FBO;
 		unsigned int fbotex;
+		unsigned int texture;
 	};
 }

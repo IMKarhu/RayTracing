@@ -12,6 +12,7 @@ namespace KarhuRayTracer
 		void use();
 
 		void setUniformVec4(const std::string& name, const glm::vec4& vec4);
+		void setUniformMat4(const std::string& name, const glm::mat4& mat4);
 
 	private:
 		unsigned int m_VertexShader;

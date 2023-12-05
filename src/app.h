@@ -3,7 +3,9 @@
 #include "imguiManager.h"
 #include "renderer.h"
 #include "shader.h"
-#include "glm/glm.hpp"
+#include "camera.h"
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
 
 namespace KarhuRayTracer
@@ -17,10 +19,17 @@ namespace KarhuRayTracer
 		void run();
 	private:
 		Window m_Window{ "Karhu RayTracer", 800, 600 };
+		Shader m_Shader{ "../shaders/VertexShader.vert","../shaders/FragmentShader.frag" };
 		Renderer m_Renderer{ m_Window };
 		ImguiManager m_ImguiManager{ m_Window, m_Renderer };
-		Shader m_Shader{ "../shaders/VertexShader.vert","../shaders/FragmentShader.frag" };
+		
+		//Camera m_Camera{ m_Window.getWidth(),m_Window.getHeight() };
 
-		float timer;
+		float m_DeltaTime = 0.0f;
+		float m_LastFrame = 0.0f;
+		glm::mat4 trans;
+		glm::mat4 m_Projection;
+		glm::mat4 m_Model = glm::mat4(1.0f);
+		glm::mat4 m_View = glm::mat4(1.0f);
 	};
 }

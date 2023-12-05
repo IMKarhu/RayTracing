@@ -1,16 +1,13 @@
 #version 460 core
 
-in vec3 outColor;
-in vec2 outTexCoord;
+in vec3 outColor; /* Needs to be same name than output in vertexShader. */
 
 out vec4 FragColor;
 
-uniform vec4 uni_outColor;
-uniform sampler2D uni_Texture;
 
 void main()
 {
-	FragColor = texture(uni_Texture, outTexCoord) * vec4(outColor, 1.0);
+	FragColor = vec4(outColor, 1.0);
 }
 
 

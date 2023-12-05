@@ -34,9 +34,9 @@ namespace KarhuRayTracer
 		/*ImGuiViewport* viewport = ImGui::GetMainViewport();
 		ImGui::SetNextWindowPos(viewport->Pos);
 		ImGui::SetNextWindowSize(viewport->Size);
-		ImGui::SetNextWindowViewport(viewport->ID);*/
-		//ImGuiID dockspaceId = ImGui::GetID("dockingWindow");
-		//ImGui::DockSpace(dockspaceId, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_PassthruCentralNode);
+		ImGui::SetNextWindowViewport(viewport->ID);
+		ImGuiID dockspaceId = ImGui::GetID("dockingWindow");
+		ImGui::DockSpace(dockspaceId, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_PassthruCentralNode);*/
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
@@ -56,8 +56,8 @@ namespace KarhuRayTracer
 	}
 	void ImguiManager::imguiRender()
 	{
-		//dockSpace(open);
-		//viewport(open);
+		dockSpace(open);
+		viewport(open);
 		ImGui::ShowDemoWindow(&show_demo_window);
 	}
 	void ImguiManager::dockSpace(bool& show)
@@ -75,11 +75,12 @@ namespace KarhuRayTracer
 			ImGui::SetNextWindowSize(viewport->Size);
 			ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
 			ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
 			windowFlags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
 						   ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
 
 			ImGui::Begin("DockSpace demo", &show, windowFlags);
-			ImGui::PopStyleVar(2);
+			ImGui::PopStyleVar(3);
 
 			ImGui::DockSpace(ImGui::GetID("DockSpace"));
 
@@ -88,14 +89,44 @@ namespace KarhuRayTracer
 	}
 	void ImguiManager::viewport(bool& show)
 	{
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
 		ImGui::Begin("ViewPort", &show, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
-		ImVec2 windowSize = ImVec2(ImGui::GetWindowWidth(), ImGui::GetWindowHeight());/* make a proper size for this. */
-		ImVec2 windowPos = ImVec2(0.0f, 0.0f);/* make a proper position for this. */
+		ImGui::PopStyleVar(2);
+		ImVec2 windowSize = viewportSize();
+		ImVec2 windowPos = centeredviewport(windowSize);
 
 		//ImGui::GetCursorPos()
-		int textureId = m_Renderer.getFrameBUffer();
+		int textureId = m_Renderer.getFrameBuffer();
+		ImGui::SetCursorPos(windowPos);
 		//ImTextureID texId = m_Window.getFrameBuffer();
-		ImGui::Image((void*)textureId, windowSize);
+		ImGui::Image((void*)textureId, windowSize,ImVec2{0,1},ImVec2{1,0});
 		ImGui::End();
+	}
+	ImVec2 ImguiManager::viewportSize()
+	{
+		ImVec2 windowSize = ImVec2();
+		windowSize = ImGui::GetContentRegionAvail();
+		/*windowSize.x -= ImGui::GetScrollX();
+		windowSize.y -= ImGui::GetScrollY();
+		float width = windowSize.x;
+		float height = width / ((float)m_Window.getWidth() / (float)m_Window.getHeight());
+		if (height > windowSize.y)
+		{
+			height = windowSize.y;
+			width = height * ((float)m_Window.getWidth() / (float)m_Window.getHeight());
+		}*/
+		return ImVec2(windowSize);
+	}
+	ImVec2 ImguiManager::centeredviewport(ImVec2 aspect)
+	{
+		ImVec2 windowSize = ImVec2();
+		windowSize = ImGui::GetContentRegionAvail();
+		windowSize.x -= ImGui::GetScrollX();
+		windowSize.y -= ImGui::GetScrollY();
+
+		float viewportX = (windowSize.x / 2.0f) - (aspect.x / 2.0f);
+		float viewportY = (windowSize.y / 2.0f) - (aspect.y / 2.0f);
+		return ImVec2(viewportX, viewportY);
 	}
 }

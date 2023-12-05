@@ -20,6 +20,8 @@ namespace KarhuRayTracer
 		void imguiRender();
 		void dockSpace(bool &show);
 		void viewport(bool& show);
+		ImVec2 viewportSize();
+		ImVec2 centeredviewport(ImVec2 aspect);
 	private:
 		Window& m_Window;
 		Renderer& m_Renderer;

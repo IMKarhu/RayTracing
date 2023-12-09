@@ -2,7 +2,7 @@
 #include "window.h"
 #include "shader.h"
 #include <iostream>
-#include <glad/gl.h>
+#include <glad.h>
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
@@ -11,37 +11,40 @@ namespace KarhuRayTracer
 	Renderer::Renderer(Window& window)
 		:m_Window(window)
 	{
-		float vertices[] =
-		{
-			-0.5f,-0.5f, 0.0f, 1.0f,0.0f,0.0f,
-			 0.5f,-0.5f, 0.0f, 0.0f,1.0f,0.0f,
-			 0.0f, 0.5f, 0.0f, 0.0f,0.0f,1.0f
-		};
+		m_Box = std::make_shared<Box>(m_Window.getWidth(),m_Window.getHeight());
+		//float vertices[] =
+		//{
+		//	-0.5f,-0.5f, 0.0f, 1.0f,0.0f,0.0f,
+		//	 0.5f,-0.5f, 0.0f, 0.0f,1.0f,0.0f,
+		//	 0.5f, 0.5f, 0.0f, 0.0f,0.0f,1.0f,
+		//	 -0.5f,0.5f, 0.0f, 1.0f,1.0f,0.0f
+		//};
 
-		unsigned int indices[] =
-		{
-			0,1,2
-		};
+		//unsigned int indices[] =
+		//{
+		//	0,1,2,
+		//	2,3,0
+		//};
 
-		glGenVertexArrays(1, &m_VAO); /* Create VertexArrayObject. */
-		glGenBuffers(1, &m_VBO); /* Create VertexBufferObject. */
-		glGenBuffers(1, &m_EBO);
+		//glGenVertexArrays(1, &m_VAO); /* Create VertexArrayObject. */
+		//glGenBuffers(1, &m_VBO); /* Create VertexBufferObject. */
+		//glGenBuffers(1, &m_EBO);
 
-		glBindVertexArray(m_VAO);
+		//glBindVertexArray(m_VAO);
 
-		glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+		//glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
+		//glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
+		//glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-		/* Position. */
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0); /* Params: location in VertexShader, number of values we input, type, normalized, stride, offset. */
-		glEnableVertexAttribArray(0);
-		/* Color. */
-		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
-		
+		///* Position. */
+		//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0); /* Params: location in VertexShader, number of values we input, type, normalized, stride, offset. */
+		//glEnableVertexAttribArray(0);
+		///* Color. */
+		//glEnableVertexAttribArray(1);
+		//glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+		//
 
 		glGenFramebuffers(1, &m_FBO);
 		glBindFramebuffer(GL_FRAMEBUFFER, m_FBO);
@@ -70,23 +73,24 @@ namespace KarhuRayTracer
 	}
 	Renderer::~Renderer()
 	{
-		glDeleteBuffers(1, &m_VAO);
+		/*glDeleteBuffers(1, &m_VAO);
 		glDeleteBuffers(1, &m_VBO);
-		glDeleteBuffers(1, &m_EBO);
+		glDeleteBuffers(1, &m_EBO);*/
 		glDeleteBuffers(1, &m_FBO);
 		glDeleteBuffers(1, &m_RBO);
 	}
 	void Renderer::render(Shader& m_Shader, float dt)
 	{
+		m_Shader.use_compute(m_Window.getWidth(), m_Window.getHeight());
 		glBindFramebuffer(GL_FRAMEBUFFER, m_FBO);
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		m_Shader.use();
 		//glEnable(GL_DEPTH_TEST);
-
-		glBindVertexArray(m_VAO);
-		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
-		glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
+		m_Box->render();
+		//glBindVertexArray(m_VAO);
+		////glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
+		//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		//glDrawArrays(GL_TRIANGLES, 0, 3);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}

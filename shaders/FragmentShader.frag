@@ -1,13 +1,15 @@
 #version 460 core
 
-in vec3 outColor; /* Needs to be same name than output in vertexShader. */
+in vec2 outUV; /* Needs to be same name than output in vertexShader. */
 
 out vec4 FragColor;
+
+uniform sampler2D screen;
 
 
 void main()
 {
-	FragColor = vec4(outColor, 1.0);
+	FragColor = texture(screen, outUV);
 }
 
 

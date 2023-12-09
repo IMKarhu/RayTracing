@@ -105,8 +105,7 @@ namespace KarhuRayTracer
 	}
 	ImVec2 ImguiManager::viewportSize()
 	{
-		ImVec2 windowSize = ImVec2();
-		windowSize = ImGui::GetContentRegionAvail();
+		m_ViewportSize = ImGui::GetContentRegionAvail();
 		/*windowSize.x -= ImGui::GetScrollX();
 		windowSize.y -= ImGui::GetScrollY();
 		float width = windowSize.x;
@@ -116,7 +115,7 @@ namespace KarhuRayTracer
 			height = windowSize.y;
 			width = height * ((float)m_Window.getWidth() / (float)m_Window.getHeight());
 		}*/
-		return ImVec2(windowSize);
+		return ImVec2(m_ViewportSize);
 	}
 	ImVec2 ImguiManager::centeredviewport(ImVec2 aspect)
 	{

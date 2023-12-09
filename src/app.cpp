@@ -34,9 +34,11 @@ namespace KarhuRayTracer
 			//float greenvalue = (sin(m_DeltaTime) / 2.0f) + 0.5f;
 			//m_Shader.setUniformVec4("uni_outColor", glm::vec4(0.0f, greenvalue, 0.0f, 1.0f));
 			/*m_Shader.setUniformMat4("transform", trans);
-			m_Shader.setUniformMat4("projection", m_Camera.getProjection());
-			m_Shader.setUniformMat4("view", m_Camera.getViewMatrix());
+			
+			
 			m_Shader.setUniformMat4("model", m_Model);*/
+			m_Shader.setUniformMat4("view", m_Camera.getViewMatrix());
+			m_Shader.setUniformMat4("projection", m_Camera.getProjection());
 			m_Renderer.rescaleFrameBuffer(m_Window.getWidth(), m_Window.getHeight());
 			//m_Shader.use();
 			m_Renderer.render(m_Shader,m_DeltaTime);

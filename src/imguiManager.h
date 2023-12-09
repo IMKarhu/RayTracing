@@ -25,6 +25,7 @@ namespace KarhuRayTracer
 	private:
 		Window& m_Window;
 		Renderer& m_Renderer;
+		ImVec2 m_ViewportSize;
 		bool show_demo_window = true;
 		bool open = true;
 		bool show_another_window = false;

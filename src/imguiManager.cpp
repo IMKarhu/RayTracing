@@ -97,10 +97,10 @@ namespace KarhuRayTracer
 		ImVec2 windowPos = centeredviewport(windowSize);
 
 		//ImGui::GetCursorPos()
-		int textureId = m_Renderer.getFrameBuffer();
+		//int textureId = m_Renderer.getFrameBuffer();
 		ImGui::SetCursorPos(windowPos);
 		//ImTextureID texId = m_Window.getFrameBuffer();
-		ImGui::Image((void*)textureId, windowSize,ImVec2{0,1},ImVec2{1,0});
+		//ImGui::Image((void*)textureId, windowSize,ImVec2{0,1},ImVec2{1,0});
 		ImGui::End();
 	}
 	ImVec2 ImguiManager::viewportSize()

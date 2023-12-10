@@ -1,5 +1,6 @@
 #pragma once
 #include "gameObject.h"
+#include "frameBuffer.h"
 #include <memory>
 
 namespace KarhuRayTracer
@@ -16,16 +17,14 @@ namespace KarhuRayTracer
 		void update(float dt);
 		void rescaleFrameBuffer(float width, float height);
 
-		unsigned int getFrameBuffer() { return fbotex; }
+		//unsigned int getFrameBuffer() { return fbotex; }
 	private:
 		Window& m_Window;
-		std::shared_ptr<Box> m_Box;
+		//FrameBuffer m_FrameBuffer{};
 		unsigned int m_VAO;
 		unsigned int m_VBO; /* Vertex buffer object. */
 		unsigned int m_EBO; /* Element buffer object. */
-		unsigned int m_FBO;
-		unsigned int m_RBO;
-		unsigned int fbotex;
+		
 		unsigned int texture;
 	};
 }

@@ -8,105 +8,78 @@
 
 namespace KarhuRayTracer
 {
+	unsigned int indices[] =
+	{
+		0,1,2,
+		2,3,0
+	};
 	Renderer::Renderer(Window& window)
 		:m_Window(window)
 	{
-		m_Box = std::make_shared<Box>(m_Window.getWidth(),m_Window.getHeight());
-		//float vertices[] =
-		//{
-		//	-0.5f,-0.5f, 0.0f, 1.0f,0.0f,0.0f,
-		//	 0.5f,-0.5f, 0.0f, 0.0f,1.0f,0.0f,
-		//	 0.5f, 0.5f, 0.0f, 0.0f,0.0f,1.0f,
-		//	 -0.5f,0.5f, 0.0f, 1.0f,1.0f,0.0f
-		//};
+		float vertices[] =
+		{
+			-1.0f,-1.0f, 0.0f,  0.0f, 0.0f,
+			 1.0f,-1.0f, 0.0f,  1.0f, 0.0f,
+			 1.0f, 1.0f, 0.0f,  1.0f, 1.0f,
+			-1.0f, 1.0f, 0.0f,  0.0f, 1.0f
+		};
+		
 
-		//unsigned int indices[] =
-		//{
-		//	0,1,2,
-		//	2,3,0
-		//};
-
-		//glGenVertexArrays(1, &m_VAO); /* Create VertexArrayObject. */
-		//glGenBuffers(1, &m_VBO); /* Create VertexBufferObject. */
-		//glGenBuffers(1, &m_EBO);
+		glCreateVertexArrays(1, &m_VAO);
+		glCreateBuffers(1, &m_VBO);
+		glCreateBuffers(1, &m_EBO);
 
 		//glBindVertexArray(m_VAO);
 
+		glNamedBufferData(m_VBO, sizeof(vertices), vertices, GL_STATIC_DRAW);
 		//glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
 		//glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
+		glNamedBufferData(m_EBO, sizeof(indices), indices, GL_STATIC_DRAW);
 		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
 		//glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-		///* Position. */
-		//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0); /* Params: location in VertexShader, number of values we input, type, normalized, stride, offset. */
+		glEnableVertexArrayAttrib(m_VAO, 0);
+		glVertexArrayAttribBinding(m_VAO, 0, 0);
+		glVertexArrayAttribFormat(m_VAO, 0, 3, GL_FLOAT, GL_FALSE, 0);
+		//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 		//glEnableVertexAttribArray(0);
-		///* Color. */
+
+		glEnableVertexArrayAttrib(m_VAO, 1);
+		glVertexArrayAttribBinding(m_VAO, 1, 0);
+		glVertexArrayAttribFormat(m_VAO, 1, 2, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat));
+		//glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
 		//glEnableVertexAttribArray(1);
-		//glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
-		//
 
-		glGenFramebuffers(1, &m_FBO);
-		glBindFramebuffer(GL_FRAMEBUFFER, m_FBO);
-		
-		glGenTextures(1, &fbotex);
-		glBindTexture(GL_TEXTURE_2D, fbotex);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_Window.getWidth(), m_Window.getHeight(), 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fbotex, 0);
-		
-		glGenRenderbuffers(1, &m_RBO);
-		glBindRenderbuffer(GL_RENDERBUFFER, m_RBO);
-		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, m_Window.getWidth(), m_Window.getHeight());
-		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_RBO);
-		
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		glBindTexture(GL_TEXTURE_2D, 0);
-		glBindRenderbuffer(GL_RENDERBUFFER, 0);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glVertexArrayVertexBuffer(m_VAO, 0, m_VBO, 0, 5 * sizeof(GLfloat));
+		glVertexArrayElementBuffer(m_VAO, m_EBO);
 
-		//glBindBuffer(GL_ARRAY_BUFFER, 0);
-		//glBindVertexArray(0);
+		glCreateTextures(GL_TEXTURE_2D, 1, &texture);
+		glTextureParameteri(texture, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTextureParameteri(texture, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTextureParameteri(texture, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTextureParameteri(texture, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTextureStorage2D(texture, 1, GL_RGBA32F, m_Window.getWidth(), m_Window.getHeight());
+		glBindImageTexture(0, texture, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA32F);
+
 	}
 	Renderer::~Renderer()
 	{
-		/*glDeleteBuffers(1, &m_VAO);
+		glDeleteBuffers(1, &m_VAO);
 		glDeleteBuffers(1, &m_VBO);
-		glDeleteBuffers(1, &m_EBO);*/
-		glDeleteBuffers(1, &m_FBO);
-		glDeleteBuffers(1, &m_RBO);
+		glDeleteBuffers(1, &m_EBO);
 	}
 	void Renderer::render(Shader& m_Shader, float dt)
 	{
-		m_Shader.use_compute(m_Window.getWidth(), m_Window.getHeight());
-		glBindFramebuffer(GL_FRAMEBUFFER, m_FBO);
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		m_Shader.use_compute(ceil(m_Window.getWidth()/8), ceil(m_Window.getHeight()/4));
 		m_Shader.use();
-		//glEnable(GL_DEPTH_TEST);
-		m_Box->render();
-		//glBindVertexArray(m_VAO);
-		////glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
-		//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-		//glDrawArrays(GL_TRIANGLES, 0, 3);
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		
+		glBindTextureUnit(0, texture);
+		m_Shader.setUniformTexture("screen", 0);
+		glBindVertexArray(m_VAO);
+		glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(indices[0]), GL_UNSIGNED_INT, 0);
 	}
-	void Renderer::rescaleFrameBuffer(float width, float height)
-	{
-		glBindTexture(GL_TEXTURE_2D, fbotex);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fbotex, 0);
-
-		glBindRenderbuffer(GL_RENDERBUFFER, m_RBO);
-		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
-		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_RBO);
-		glViewport(0, 0, width, height);
-	}
+	
 }

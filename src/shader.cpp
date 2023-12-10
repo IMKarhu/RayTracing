@@ -140,4 +140,13 @@ namespace KarhuRayTracer
 		}
 		glUniformMatrix4fv(location, 1, GL_FALSE, &mat4[0][0]);
 	}
+	void Shader::setUniformTexture(const std::string& name, int value)
+	{
+		int location = glGetUniformLocation(m_ShaderProgram, name.c_str());
+		if (location < 0)
+		{
+			return;
+		}
+		glUniform1i(location, value);
+	}
 }

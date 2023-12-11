@@ -22,7 +22,7 @@ namespace KarhuRayTracer
 		Shader m_Shader{ "../shaders/VertexShader.vert","../shaders/FragmentShader.frag", "../shaders/RayTracingKernel.comp"};
 		Renderer m_Renderer{ m_Window };
 		ImguiManager m_ImguiManager{ m_Window, m_Renderer };
-		//Camera m_Camera{ m_Window.getWidth(),m_Window.getHeight() };
+		Camera m_Camera{ m_Shader, m_Window, glm::vec3(0.0f,0.0f,0.0), glm::vec3(0.0f,0.0f,1.0f) };
 
 		float m_DeltaTime = 0.0f;
 		float m_LastFrame = 0.0f;

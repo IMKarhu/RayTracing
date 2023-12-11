@@ -17,7 +17,8 @@ namespace KarhuRayTracer
 			
 			float currentFrame = m_Window.getGlfwTime();
 			m_DeltaTime = currentFrame - m_LastFrame;
-			
+
+			m_Camera.update(m_DeltaTime);
 			m_Renderer.render(m_Shader,m_DeltaTime);
 			/*m_ImguiManager.begin();
 			m_ImguiManager.imguiRender();

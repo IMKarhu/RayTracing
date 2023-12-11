@@ -1,5 +1,6 @@
 #pragma once
 #include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <iostream>
 
 namespace KarhuRayTracer
@@ -15,6 +16,9 @@ namespace KarhuRayTracer
 		void setUniformVec4(const std::string& name, const glm::vec4& vec4);
 		void setUniformMat4(const std::string& name, const glm::mat4& mat4);
 		void setUniformTexture(const std::string& name, int value);
+
+		/* Compute. */
+		void setCUniformVec3(const std::string& name, const glm::vec3& vec3);
 
 	private:
 		unsigned int m_VertexShader;

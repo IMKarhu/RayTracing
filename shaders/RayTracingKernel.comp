@@ -8,6 +8,8 @@ uniform vec3 CameraForward;
 uniform vec3 CameraRight;
 uniform vec3 CameraUp;
 
+const vec3 sunDirection = normalize(vec3(1.0, 0.5, 0.0));
+
 struct Sphere
 {
 	vec3 Center;
@@ -21,35 +23,70 @@ struct Ray
 	vec3 RayDirection;
 };
 
+bool hit(Ray ray, Sphere sphere, inout float t);
+
 void main()
 {
-	vec4 pixel = vec4(0.075, 0.133, 0.173, 1.0);
+	vec3 pixel = vec3(0.0,0.0,0.0);
 	ivec2 pixel_coords = ivec2(gl_GlobalInvocationID.xy);
 
 	ivec2 dims = imageSize(screen);
 	float x = -(float(pixel_coords.x * 2 - dims.x) / dims.x); // [-1.0, 1.0]
-	float y = -(float(pixel_coords.y * 2 - dims.y) / dims.y); // [-1.0, 1.0]
+	float y = -(float(pixel_coords.y * 2 - dims.y) / dims.x); // [-1.0, 1.0]
 
 	Ray m_Ray;
 	float fov = 90.0;
-	vec3 CameraOrigin = vec3(0.0,0.0, -tan(fov/2.0));
-	m_Ray.RayOrigin = vec3(x, y, 0.0);
-	m_Ray.RayDirection = normalize(m_Ray.RayOrigin - CameraOrigin);
+	vec3 CameraOrigin = vec3(0.0,0.0, 1.0);
+	m_Ray.RayOrigin = CameraPosition; // oli (x,y,0.0) nyt on (0.0,0.0,1.0)
+	m_Ray.RayDirection = normalize(CameraForward + x * CameraRight + y * CameraUp);
 
 	Sphere m_Sphere;
-	m_Sphere.Center = vec3(0.0, 0.0, -5.0);
-	m_Sphere.Radius = 1.0;
+	m_Sphere.Center = vec3(0.0, 0.0, 0.0);
+	m_Sphere.Radius = 2.0;
+	m_Sphere.Colour = vec3(1.0, 0.75, 0.5);
 
-	vec3 o_c = m_Ray.RayOrigin - m_Sphere.Center;
-	float b = dot(m_Ray.RayDirection, o_c);
-	float c = dot(o_c, o_c) - m_Sphere.Radius * m_Sphere.Radius;
-	float intersectionState = b * b - c;
-	vec3 intersection = m_Ray.RayOrigin + m_Ray.RayDirection * (-b + sqrt(b * b - c));
+	float t = 99999;
 
-	if(intersectionState >= 0)
+	//vec3 o_c = m_Ray.RayOrigin - m_Sphere.Center;
+	//float b = dot(m_Ray.RayDirection, o_c);
+	//float c = dot(o_c, o_c) - m_Sphere.Radius * m_Sphere.Radius;
+	//float intersectionState = b * b - c;
+	//vec3 intersection = m_Ray.RayOrigin + m_Ray.RayDirection * (-b + sqrt(b * b - c));
+
+	if(hit(m_Ray, m_Sphere, t))
 	{
-		pixel = vec4((normalize(intersection - m_Sphere.Center) + 1.0) / 2.0, 1.0);
+		vec3 hit_pos = m_Ray.RayOrigin + t * m_Ray.RayDirection;
+		vec3 normal = normalize(hit_pos - m_Sphere.Center);
+		float light_amount = max(0.0, dot(-sunDirection, normal));
+		pixel = light_amount * m_Sphere.Colour;
 	}
 
-	imageStore(screen, pixel_coords, pixel);
+	imageStore(screen, pixel_coords, vec4(pixel, 1.0));
+}
+
+
+bool hit(Ray ray, Sphere sphere, inout float t)
+{
+	vec3 o_c = ray.RayOrigin - sphere.Center;
+	float a = dot(ray.RayDirection, ray.RayDirection);
+	float b = 2 * dot(ray.RayDirection, o_c);
+	float c = dot(o_c, o_c) - sphere.Radius * sphere.Radius;
+	float intersectionState = b * b - 4 * a * c;
+	if(intersectionState < 0)
+	{
+		return false;
+	}
+
+	//vec3 intersection = ray.RayOrigin + ray.RayDirection * (-b + sqrt(b * b - c));
+	float tHit = (-b - sqrt(intersectionState)) / (2 * a);
+	if(tHit < t && tHit > 0.0001)
+	{
+		t = tHit;
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+	
 }

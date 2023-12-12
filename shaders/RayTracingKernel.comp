@@ -29,10 +29,15 @@ void main()
 {
 	vec3 pixel = vec3(0.0,0.0,0.0);
 	ivec2 pixel_coords = ivec2(gl_GlobalInvocationID.xy);
-
 	ivec2 dims = imageSize(screen);
-	float x = -(float(pixel_coords.x * 2 - dims.x) / dims.x); // [-1.0, 1.0]
-	float y = -(float(pixel_coords.y * 2 - dims.y) / dims.x); // [-1.0, 1.0]
+
+	if(pixel_coords.x >= dims.x || pixel_coords.y >= dims.y)
+	{
+		return;
+	}
+
+	float x = (2.0 * pixel_coords.x - dims.x) / dims.x; // [-1.0, 1.0]
+	float y = (2.0 * pixel_coords.y - dims.y) / dims.x; // [-1.0, 1.0]
 
 	Ray m_Ray;
 	float fov = 90.0;
@@ -41,8 +46,8 @@ void main()
 	m_Ray.RayDirection = normalize(CameraForward + x * CameraRight + y * CameraUp);
 
 	Sphere m_Sphere;
-	m_Sphere.Center = vec3(0.0, 0.0, 0.0);
-	m_Sphere.Radius = 2.0;
+	m_Sphere.Center = vec3(3.0, 0.0, 0.0);
+	m_Sphere.Radius = 1.0;
 	m_Sphere.Colour = vec3(1.0, 0.75, 0.5);
 
 	float t = 99999;
@@ -55,6 +60,7 @@ void main()
 
 	if(hit(m_Ray, m_Sphere, t))
 	{
+		pixel = m_Sphere.Colour;
 		vec3 hit_pos = m_Ray.RayOrigin + t * m_Ray.RayDirection;
 		vec3 normal = normalize(hit_pos - m_Sphere.Center);
 		float light_amount = max(0.0, dot(-sunDirection, normal));

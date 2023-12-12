@@ -7,13 +7,14 @@ namespace KarhuRayTracer
 {
 	class Window;
 	class Shader;
+	class Camera;
 	class Renderer
 	{
 	public:
 		Renderer(Window& window);
 		~Renderer();
 
-		void render(Shader& m_Shader, float dt);
+		void render(Shader& m_Shader, Camera& m_Camera, float dt);
 		void update(float dt);
 		void rescaleFrameBuffer(float width, float height);
 

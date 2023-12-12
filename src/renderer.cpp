@@ -1,6 +1,7 @@
 #include "renderer.h"
 #include "window.h"
 #include "shader.h"
+#include "camera.h"
 #include <iostream>
 #include <glad.h>
 #define STB_IMAGE_IMPLEMENTATION
@@ -69,11 +70,12 @@ namespace KarhuRayTracer
 		glDeleteBuffers(1, &m_VBO);
 		glDeleteBuffers(1, &m_EBO);
 	}
-	void Renderer::render(Shader& m_Shader, float dt)
+	void Renderer::render(Shader& m_Shader, Camera& m_Camera, float dt)
 	{
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		m_Shader.use_compute(ceil(m_Window.getWidth()/8), ceil(m_Window.getHeight()/4));
+		m_Camera.update(dt);
 		m_Shader.use();
 		
 		glBindTextureUnit(0, texture);

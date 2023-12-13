@@ -1,4 +1,5 @@
 #pragma once
+#include <vector>
 #include <glm/glm.hpp>
 
 namespace KarhuRayTracer
@@ -9,13 +10,14 @@ namespace KarhuRayTracer
 	class Camera
 	{
 	public:
-		Camera(Shader& shader, Window& m_Window, glm::vec3 position, glm::vec3 eulers);
+		Camera(std::vector<Shader>& shaders, Window& m_Window, glm::vec3 position, glm::vec3 eulers);
 		~Camera();
 
 		void update(float deltatime);
 		
+		const glm::mat4 getViewMatrix();
 	private:
-		Shader& m_Shader;
+		std::vector<Shader>& m_Shaders;
 		Window& m_Window;
 		glm::vec3 m_Position;    /* Cameras position. */
 		//glm::vec3 m_Target;      /* */
@@ -25,6 +27,12 @@ namespace KarhuRayTracer
 		glm::vec3 m_CameraUp;	 /* Points Cameras positive y-axis. */
 		glm::vec3 m_Eulers;
 
+		glm::mat4 m_ViewMatrix;
 		float m_Fov;
+		float m_Sensitivity;
+		float m_Yaw;
+		float m_Pitch;
+
+		void MouseInput(float xoffset, float yoffset, bool constrainPitch = true);
 	};
 }

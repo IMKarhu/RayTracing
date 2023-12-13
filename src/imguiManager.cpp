@@ -1,10 +1,11 @@
 #include "imguiManager.h"
 #include "window.h"
+#include "renderer.h"
 
 namespace KarhuRayTracer
 {
-	ImguiManager::ImguiManager(Window& window)
-		:m_Window(window)
+	ImguiManager::ImguiManager(Window& window, Renderer& renderer)
+		:m_Window(window), m_Renderer(renderer)
 	{
 		(void)io;
 		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
@@ -20,7 +21,7 @@ namespace KarhuRayTracer
 		}
 		
 		ImGui_ImplGlfw_InitForOpenGL(window.getWindow(), true);
-		ImGui_ImplOpenGL3_Init("#version 330 core");
+		ImGui_ImplOpenGL3_Init("#version 460 core");
 	}
 	ImguiManager::~ImguiManager()
 	{
@@ -33,9 +34,9 @@ namespace KarhuRayTracer
 		/*ImGuiViewport* viewport = ImGui::GetMainViewport();
 		ImGui::SetNextWindowPos(viewport->Pos);
 		ImGui::SetNextWindowSize(viewport->Size);
-		ImGui::SetNextWindowViewport(viewport->ID);*/
-		//ImGuiID dockspaceId = ImGui::GetID("dockingWindow");
-		//ImGui::DockSpace(dockspaceId, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_PassthruCentralNode);
+		ImGui::SetNextWindowViewport(viewport->ID);
+		ImGuiID dockspaceId = ImGui::GetID("dockingWindow");
+		ImGui::DockSpace(dockspaceId, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_PassthruCentralNode);*/
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
@@ -53,43 +54,88 @@ namespace KarhuRayTracer
 			glfwMakeContextCurrent(backup_current_context);
 		}
 	}
-	void ImguiManager::imguiRender()
+	void ImguiManager::imguiRender(glm::vec3& position)
 	{
-		if (show_demo_window)
+		//dockSpace(open);
+		//viewport(open);
+		ObjectSettings(position);
+		ImGui::ShowDemoWindow(&show_demo_window);
+	}
+	void ImguiManager::dockSpace(bool& show)
+	{
+		static bool optFullSreenPersistant = true;
+		bool optFullScreen = optFullSreenPersistant;
+
+		static ImGuiDockNodeFlags dockSpaceFlags = ImGuiDockNodeFlags_None;
+
+		ImGuiWindowFlags windowFlags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
+		if (optFullScreen)
 		{
-			ImGui::ShowDemoWindow(&show_demo_window);
-		}
+			ImGuiViewport* viewport = ImGui::GetMainViewport();
+			ImGui::SetNextWindowPos(viewport->Pos);
+			ImGui::SetNextWindowSize(viewport->Size);
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+			windowFlags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
+						   ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
 
-		{
-			static float f = 0.0f;
-			static int counter = 0;
+			ImGui::Begin("DockSpace demo", &show, windowFlags);
+			ImGui::PopStyleVar(3);
 
-			ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
+			ImGui::DockSpace(ImGui::GetID("DockSpace"));
 
-			ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-			ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
-			ImGui::Checkbox("Another Window", &show_another_window);
-
-			ImGui::SliderFloat("float", &f, 0.0f, 1.0f);          // Edit 1 float using a slider from 0.0f to 1.0f
-			//ImGui::SliderFloat3("translation", &rectangle.getPosition().x, 0.0f, 800.0f);
-			//ImGui::SliderFloat3("scale", &rectangle.getScale().x, 0.0f, 800.0f);
-			ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
-
-			if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-				counter++;
-			ImGui::SameLine();
-			ImGui::Text("counter = %d", counter);
-
-			//ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
 			ImGui::End();
 		}
-		if (show_another_window)
+	}
+
+	void ImguiManager::viewport(bool& show)
+	{
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+		ImGui::Begin("ViewPort", &show, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+		ImGui::PopStyleVar(2);
+		ImVec2 windowSize = viewportSize();
+		ImVec2 windowPos = centeredviewport(windowSize);
+
+		//ImGui::GetCursorPos()
+		//int textureId = m_Renderer.getFrameBuffer();
+		ImGui::SetCursorPos(windowPos);
+		//ImTextureID texId = m_Window.getFrameBuffer();
+		//ImGui::Image((void*)textureId, windowSize,ImVec2{0,1},ImVec2{1,0});
+		ImGui::End();
+	}
+
+	void ImguiManager::ObjectSettings(glm::vec3& position)
+	{
+		ImGui::Begin("Settings");
+		ImGui::SliderFloat("Position X", &position.x, 0.0f, 100.0f);
+		ImGui::End();
+	}
+
+	ImVec2 ImguiManager::viewportSize()
+	{
+		m_ViewportSize = ImGui::GetContentRegionAvail();
+		/*windowSize.x -= ImGui::GetScrollX();
+		windowSize.y -= ImGui::GetScrollY();
+		float width = windowSize.x;
+		float height = width / ((float)m_Window.getWidth() / (float)m_Window.getHeight());
+		if (height > windowSize.y)
 		{
-			ImGui::Begin("Another Window", &show_another_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
-			ImGui::Text("Hello from another window!");
-			if (ImGui::Button("Close Me"))
-				show_another_window = false;
-			ImGui::End();
-		}
+			height = windowSize.y;
+			width = height * ((float)m_Window.getWidth() / (float)m_Window.getHeight());
+		}*/
+		return ImVec2(m_ViewportSize);
+	}
+	ImVec2 ImguiManager::centeredviewport(ImVec2 aspect)
+	{
+		ImVec2 windowSize = ImVec2();
+		windowSize = ImGui::GetContentRegionAvail();
+		windowSize.x -= ImGui::GetScrollX();
+		windowSize.y -= ImGui::GetScrollY();
+
+		float viewportX = (windowSize.x / 2.0f) - (aspect.x / 2.0f);
+		float viewportY = (windowSize.y / 2.0f) - (aspect.y / 2.0f);
+		return ImVec2(viewportX, viewportY);
 	}
 }

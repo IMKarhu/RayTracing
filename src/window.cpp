@@ -21,19 +21,21 @@ namespace KarhuRayTracer
 
 	void Window::initWindow()
 	{
+		
 		if (!glfwInit())
 		{
 			throw std::runtime_error("Failed to initialize GLFW!\n");
 		}
 
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
+		//glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 		m_Window = glfwCreateWindow(static_cast<int>(m_Width), static_cast<int>(m_Height), m_Title, nullptr, nullptr);
 		glfwMakeContextCurrent(m_Window);
 
-		if (!gladLoadGL(glfwGetProcAddress))
+		if (!gladLoadGL())
 		{
 			printf("Failed to initialize OpenGL context!\n");
 		}
@@ -43,6 +45,9 @@ namespace KarhuRayTracer
 		glfwSetFramebufferSizeCallback(m_Window, framebuffer_size_callback);
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
+
+		
+		printf("%s\n", glGetString(GL_VERSION));
 	}
 
 	void Window::pollEvents()

@@ -7,19 +7,28 @@
 namespace KarhuRayTracer
 {
 	class Window;
+	class Renderer;
 
 	class ImguiManager
 	{
 	public:
-		ImguiManager(Window& window);
+		ImguiManager(Window& window, Renderer& renderer);
 		~ImguiManager();
 
 		void begin();
 		void end();
-		void imguiRender();
+		void imguiRender(glm::vec3& position);
+		void dockSpace(bool &show);
+		void viewport(bool& show);
+		void ObjectSettings(glm::vec3& position);
+		ImVec2 viewportSize();
+		ImVec2 centeredviewport(ImVec2 aspect);
 	private:
 		Window& m_Window;
-		bool show_demo_window = false;
+		Renderer& m_Renderer;
+		ImVec2 m_ViewportSize;
+		bool show_demo_window = true;
+		bool open = true;
 		bool show_another_window = false;
 		glm::vec4 clear_color = glm::vec4(0.45f, 0.55f, 0.60f, 1.00f);
 		ImGuiIO& io = ImGui::GetIO();

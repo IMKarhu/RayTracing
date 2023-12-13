@@ -1,12 +1,38 @@
 #version 460 core
 
+struct Material
+{
+	vec3 m_Albeido;
+	vec3 m_Specular;
+	vec3 m_Emission;
+	float m_Roughness;
+};
+
+struct Object
+{
+	vec3 position;
+	vec3 scale;
+	vec3 colour;
+	float radius;
+	Material material;
+};
+
 layout(local_size_x = 8, local_size_y = 4, local_size_z = 1) in;
 layout(rgba32f, binding = 0) uniform image2D screen;
+
+//layout(std430, binding=2) buffer Object
+//{
+//	vec3 position;
+//	vec3 scale;
+//	Material material;
+//};
 
 uniform vec3 CameraPosition;
 uniform vec3 CameraForward;
 uniform vec3 CameraRight;
 uniform vec3 CameraUp;
+uniform Object u_Objects;
+uniform Material u_Material;
 
 const vec3 sunDirection = normalize(vec3(1.0, 0.5, 0.0));
 
@@ -46,7 +72,7 @@ void main()
 	m_Ray.RayDirection = normalize(CameraForward + x * CameraRight + y * CameraUp);
 
 	Sphere m_Sphere;
-	m_Sphere.Center = vec3(3.0, 0.0, 0.0);
+	m_Sphere.Center = u_Objects.position;
 	m_Sphere.Radius = 1.0;
 	m_Sphere.Colour = vec3(1.0, 0.75, 0.5);
 

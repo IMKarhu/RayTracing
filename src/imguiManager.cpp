@@ -54,10 +54,11 @@ namespace KarhuRayTracer
 			glfwMakeContextCurrent(backup_current_context);
 		}
 	}
-	void ImguiManager::imguiRender()
+	void ImguiManager::imguiRender(glm::vec3& position)
 	{
-		dockSpace(open);
-		viewport(open);
+		//dockSpace(open);
+		//viewport(open);
+		ObjectSettings(position);
 		ImGui::ShowDemoWindow(&show_demo_window);
 	}
 	void ImguiManager::dockSpace(bool& show)
@@ -87,6 +88,7 @@ namespace KarhuRayTracer
 			ImGui::End();
 		}
 	}
+
 	void ImguiManager::viewport(bool& show)
 	{
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
@@ -97,12 +99,20 @@ namespace KarhuRayTracer
 		ImVec2 windowPos = centeredviewport(windowSize);
 
 		//ImGui::GetCursorPos()
-		int textureId = m_Renderer.getFrameBuffer();
+		//int textureId = m_Renderer.getFrameBuffer();
 		ImGui::SetCursorPos(windowPos);
 		//ImTextureID texId = m_Window.getFrameBuffer();
-		ImGui::Image((void*)textureId, windowSize,ImVec2{0,1},ImVec2{1,0});
+		//ImGui::Image((void*)textureId, windowSize,ImVec2{0,1},ImVec2{1,0});
 		ImGui::End();
 	}
+
+	void ImguiManager::ObjectSettings(glm::vec3& position)
+	{
+		ImGui::Begin("Settings");
+		ImGui::SliderFloat("Position X", &position.x, 0.0f, 100.0f);
+		ImGui::End();
+	}
+
 	ImVec2 ImguiManager::viewportSize()
 	{
 		m_ViewportSize = ImGui::GetContentRegionAvail();

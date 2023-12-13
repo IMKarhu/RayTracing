@@ -1,17 +1,16 @@
 #version 460 core
 
-layout (location = 0) in vec3 inPosition;
-layout (location = 1) in vec2 inUV;
+layout(location = 0) in vec3 inPosition;
 
-out vec2 outUV;
+out vec3 texCoords;
 
 uniform mat4 projection;
 uniform mat4 view;
 
 void main()
 {
-	gl_Position = vec4(inPosition, 1.0);
-	outUV =  inUV;
+	texCoords = inPosition;
+	gl_Position = projection * view * vec4(inPosition, 1.0);
 }
 
 /* Typical structure in shaders.

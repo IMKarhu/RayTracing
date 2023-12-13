@@ -6,36 +6,31 @@
 
 namespace KarhuRayTracer
 {
-	Shader::Shader(const char* vertexShader, const char* fragmentShader, const char* computeShader)
+	Shader::Shader(const char* vertexShader, const char* fragmentShader)
 	{
 		std::string vertexCode;
 		std::string fragmentCode;
-		std::string computeCode;
+		
 		std::ifstream vShaderFile;
 		std::ifstream fShaderFile;
-		std::ifstream cShaderFile;
+		
 		vShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
 		fShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-		cShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
 		try
 		{
 			// open files
 			vShaderFile.open(vertexShader);
 			fShaderFile.open(fragmentShader);
-			cShaderFile.open(computeShader);
-			std::stringstream vShaderStream, fShaderStream, cShaderStream;
+			std::stringstream vShaderStream, fShaderStream;
 			// read file's buffer contents into streams
 			vShaderStream << vShaderFile.rdbuf();
 			fShaderStream << fShaderFile.rdbuf();
-			cShaderStream << cShaderFile.rdbuf();
 			// close file handlers
 			vShaderFile.close();
 			fShaderFile.close();
-			cShaderFile.close();
 			// convert stream into string
 			vertexCode = vShaderStream.str();
 			fragmentCode = fShaderStream.str();
-			computeCode = cShaderStream.str();
 		}
 		catch (std::ifstream::failure& e)
 		{
@@ -43,7 +38,6 @@ namespace KarhuRayTracer
 		}
 		const char* vShaderCode = vertexCode.c_str();
 		const char* fShaderCode = fragmentCode.c_str();
-		const char* cShaderCode = computeCode.c_str();
 
 		m_VertexShader = glCreateShader(GL_VERTEX_SHADER);
 
@@ -71,10 +65,6 @@ namespace KarhuRayTracer
 			glGetShaderInfoLog(m_FragmentShader, 512, nullptr, infoLog);
 			std::cout << "Error Shader fragment compilation failed!\n" << infoLog << std::endl;
 		}
-
-		m_ComputeShader = glCreateShader(GL_COMPUTE_SHADER);
-		glShaderSource(m_ComputeShader, 1, &cShaderCode, nullptr);
-		glCompileShader(m_ComputeShader);
 		
 		m_ShaderProgram = glCreateProgram();
 
@@ -88,21 +78,52 @@ namespace KarhuRayTracer
 			glGetProgramInfoLog(m_ShaderProgram, 512, NULL, infoLog);
 		}
 
+		glDeleteShader(m_VertexShader);
+		glDeleteShader(m_FragmentShader);
+	}
+
+	Shader::Shader(const char* computeShader)
+	{
+		std::string computeCode;
+
+		std::ifstream cShaderFile;
+		cShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+		try
+		{
+			// open files
+			cShaderFile.open(computeShader);
+			std::stringstream cShaderStream;
+			// read file's buffer contents into streams
+			cShaderStream << cShaderFile.rdbuf();
+			// close file handlers
+			cShaderFile.close();
+			// convert stream into string
+			computeCode = cShaderStream.str();
+		}
+		catch (std::ifstream::failure& e)
+		{
+			std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ: " << e.what() << e.code() << std::endl;
+		}
+		const char* cShaderCode = computeCode.c_str();
+
+		m_ComputeShader = glCreateShader(GL_COMPUTE_SHADER);
+		glShaderSource(m_ComputeShader, 1, &cShaderCode, nullptr);
+		glCompileShader(m_ComputeShader);
+
 		m_ComputeProgram = glCreateProgram();
 
 		glAttachShader(m_ComputeProgram, m_ComputeShader);
 		glLinkProgram(m_ComputeProgram);
 
+		int success;
+		char infoLog[512];
 		glGetProgramiv(m_ComputeProgram, GL_LINK_STATUS, &success);
 		if (!success)
 		{
 			glGetProgramInfoLog(m_ComputeProgram, 512, NULL, infoLog);
 		}
 
-		//glUseProgram(m_ShaderProgram); // move this to render function
-
-		glDeleteShader(m_VertexShader);
-		glDeleteShader(m_FragmentShader);
+		glDeleteShader(m_ComputeShader);
 	}
 
 	Shader::~Shader()
@@ -158,5 +179,14 @@ namespace KarhuRayTracer
 			return;
 		}
 		glUniform3fv(location, 1, glm::value_ptr(vec3));
+	}
+	void Shader::setCUniformfloat(const std::string& name, const float& value)
+	{
+		int location = glGetUniformLocation(m_ComputeProgram, name.c_str());
+		if (location < 0)
+		{
+			return;
+		}
+		glUniform1f(location, value);
 	}
 }

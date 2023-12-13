@@ -8,7 +8,8 @@ namespace KarhuRayTracer
 	class Shader
 	{
 	public:
-		Shader(const char* vertexShader, const char* fragmentShader, const char* computeShader);
+		Shader(const char* vertexShader, const char* fragmentShader);
+		Shader(const char* computeShader);
 		~Shader();
 		void use();
 		void use_compute(float width, float height);
@@ -19,6 +20,7 @@ namespace KarhuRayTracer
 
 		/* Compute. */
 		void setCUniformVec3(const std::string& name, const glm::vec3& vec3);
+		void setCUniformfloat(const std::string& name, const float& value);
 
 	private:
 		unsigned int m_VertexShader;

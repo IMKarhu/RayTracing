@@ -10,12 +10,13 @@ namespace KarhuRayTracer
 	class Camera
 	{
 	public:
-		Camera(std::vector<Shader>& shaders, Window& m_Window, glm::vec3 position, glm::vec3 eulers);
+		Camera(std::vector<Shader>& shaders, Window& m_Window, glm::vec3 position, glm::vec3 eulers, float fov);
 		~Camera();
 
 		void update(float deltatime);
 		
 		const glm::mat4 getViewMatrix();
+		const glm::mat3 getProjectionMatrix();
 	private:
 		std::vector<Shader>& m_Shaders;
 		Window& m_Window;
@@ -28,11 +29,14 @@ namespace KarhuRayTracer
 		glm::vec3 m_Eulers;
 
 		glm::mat4 m_ViewMatrix;
+		glm::mat4 m_Projection = glm::mat4(1.0f);
 		float m_Fov;
 		float m_Sensitivity;
 		float m_Yaw;
 		float m_Pitch;
 
 		void MouseInput(float xoffset, float yoffset, bool constrainPitch = true);
+		void reCalculateProjection();
+		void reCalculateviewMatrix();
 	};
 }

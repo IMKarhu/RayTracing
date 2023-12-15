@@ -54,11 +54,11 @@ namespace KarhuRayTracer
 			glfwMakeContextCurrent(backup_current_context);
 		}
 	}
-	void ImguiManager::imguiRender(glm::vec3& position)
+	void ImguiManager::imguiRender(glm::vec3& position, float deltatime)
 	{
 		//dockSpace(open);
 		//viewport(open);
-		ObjectSettings(position);
+		ObjectSettings(position, deltatime);
 		ImGui::ShowDemoWindow(&show_demo_window);
 	}
 	void ImguiManager::dockSpace(bool& show)
@@ -106,9 +106,10 @@ namespace KarhuRayTracer
 		ImGui::End();
 	}
 
-	void ImguiManager::ObjectSettings(glm::vec3& position)
+	void ImguiManager::ObjectSettings(glm::vec3& position, float deltatime)
 	{
 		ImGui::Begin("Settings");
+		ImGui::Text("Render: %.3fms", deltatime);
 		ImGui::SliderFloat("Position X", &position.x, 0.0f, 100.0f);
 		ImGui::End();
 	}

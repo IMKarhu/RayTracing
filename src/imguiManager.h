@@ -17,10 +17,10 @@ namespace KarhuRayTracer
 
 		void begin();
 		void end();
-		void imguiRender(glm::vec3& position);
+		void imguiRender(glm::vec3& position, float deltatime);
 		void dockSpace(bool &show);
 		void viewport(bool& show);
-		void ObjectSettings(glm::vec3& position);
+		void ObjectSettings(glm::vec3& position, float deltatime);
 		ImVec2 viewportSize();
 		ImVec2 centeredviewport(ImVec2 aspect);
 	private:

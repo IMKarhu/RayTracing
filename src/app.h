@@ -22,10 +22,12 @@ namespace KarhuRayTracer
 		Window m_Window{ "Karhu RayTracer", 800, 600 };
 		std::vector<Shader> m_Shaders;
 		//Shader m_Shader{ "../shaders/VertexShader.vert","../shaders/FragmentShader.frag", "../shaders/RayTracingKernel.comp"};
-		Camera m_Camera{ m_Shaders, m_Window, glm::vec3(0.0f,0.0f,0.0), glm::vec3(0.0f,0.0f,1.0f) };
+		Camera m_Camera{ m_Shaders, m_Window, glm::vec3(0.0f,0.0f,0.0), glm::vec3(0.0f,0.0f,1.0f), 45.0f };
 		Renderer m_Renderer{ m_Window };
 		ImguiManager m_ImguiManager{ m_Window, m_Renderer };
-		Object m_Object;
+		Material m_Material;
+		std::vector<Object> m_Objects;
+		Object m_Objects1;
 
 		float m_DeltaTime = 0.0f;
 		float m_LastFrame = 0.0f;

@@ -11,7 +11,18 @@ namespace KarhuRayTracer
 		m_Shaders.push_back(Shader{ "../shaders/RayTracingKernel.comp" });
 		m_Shaders.push_back(Shader{ "../shaders/SkyBox.vert", "../shaders/SkyBox.frag" });
 
-		m_Object.m_Position = glm::vec3(3.0f, 0.0f, 0.0f);
+		m_Objects.push_back({ glm::vec3(3.0f, 0.0f, 0.0f), glm::vec3(2.0, 0.0, 0.0), glm::vec3(1.0, 0.75, 0.5), 1.0f, m_Material });
+		m_Objects.push_back({ glm::vec3(6.0f, 0.0f, 0.0f), glm::vec3(2.0, 0.0, 0.0), glm::vec3(1.0, 0.75, 0.5), 1.0f, m_Material });
+		/*m_Objects.m_Position = glm::vec3(3.0f, 0.0f, 0.0f);
+		m_Objects.m_Radius = 1.0f;
+		m_Objects.m_Colour = glm::vec3(1.0, 0.75, 0.5);*/
+		//
+		/*m_Objects1.m_Position = glm::vec3(6.0f, 0.0f, 0.0f);
+		m_Objects1.m_Radius = 1.0f;
+		m_Objects1.m_Colour = glm::vec3(1.0, 0.75, 0.5);*/
+		/*m_Object.m_Position = glm::vec3(3.0f, 0.0f, 0.0f);
+		m_Object.m_Radius = 1.0f;
+		m_Object.m_Colour = glm::vec3(1.0, 0.75, 0.5);*/
 	}
 	App::~App()
 	{
@@ -26,9 +37,9 @@ namespace KarhuRayTracer
 			m_DeltaTime = currentFrame - m_LastFrame;
 
 			//m_Camera.update(m_DeltaTime);
-			m_Renderer.render(m_Shaders,m_Camera, m_Object, m_DeltaTime);
+			m_Renderer.render(m_Shaders,m_Camera, m_Objects, m_DeltaTime);
 			m_ImguiManager.begin();
-			m_ImguiManager.imguiRender(m_Object.m_Position);
+			m_ImguiManager.imguiRender(m_Objects[0].m_Position, m_DeltaTime);
 			m_ImguiManager.end();
 			//m_Camera.update(m_DeltaTime);
 

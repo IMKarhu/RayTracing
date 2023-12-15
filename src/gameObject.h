@@ -1,4 +1,5 @@
 #pragma once
+#include <vector>
 #include <glm/glm.hpp>
 
 namespace KarhuRayTracer
@@ -20,12 +21,13 @@ namespace KarhuRayTracer
 		float m_Radius;
 		Material m_Material;
 
-		Object();
-		Object(glm::vec3& position, glm::vec3& scale, glm::vec3& colour, float radius, Material material);
+		/*Object();
+		Object(glm::vec3& position, glm::vec3& scale, glm::vec3& colour, float radius, Material material);*/
 	};
 
 	
 	
 
-	void bind(Shader& m_Shader, Object object);
+	void bind(Shader& m_Shader, std::vector<Object> objects);
+	void bind1(Shader& m_Shader, Object object);
 }

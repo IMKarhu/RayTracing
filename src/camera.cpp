@@ -13,7 +13,8 @@ namespace KarhuRayTracer
          m_Shaders(shaders),
          m_Window(window)
     {
-       m_Projection = glm::perspective(glm::radians(m_Fov), (float)m_Window.getWidth() / (float)m_Window.getHeight(), 0.1f, 100.0f);
+        m_CameraSpeed = 2.0f;
+        m_Projection = glm::perspective(glm::radians(m_Fov), (float)m_Window.getWidth() / (float)m_Window.getHeight(), 0.1f, 100.0f);
     }
     Camera::~Camera()
     {
@@ -36,19 +37,19 @@ namespace KarhuRayTracer
         glm::vec3 position = m_Position;
         if (glfwGetKey(m_Window.getWindow(), GLFW_KEY_W) == GLFW_PRESS)
         {
-            position.x += 1.0f * deltatime;
+            position += m_Forward * m_CameraSpeed * deltatime;
         }
         if (glfwGetKey(m_Window.getWindow(), GLFW_KEY_S) == GLFW_PRESS)
         {
-            position.x -= 1.0f * deltatime;
+            position -= m_Forward * m_CameraSpeed * deltatime;
         }
         if (glfwGetKey(m_Window.getWindow(), GLFW_KEY_A) == GLFW_PRESS)
         {
-            position.y += 1.0f * deltatime;
+            position -= m_CameraRight * m_CameraSpeed * deltatime;
         }
         if (glfwGetKey(m_Window.getWindow(), GLFW_KEY_D) == GLFW_PRESS)
         {
-            position.y -= 1.0f * deltatime;
+            position += m_CameraRight * m_CameraSpeed * deltatime;
         }
         if (glfwGetKey(m_Window.getWindow(), GLFW_KEY_0) == GLFW_PRESS)
         {
@@ -93,26 +94,12 @@ namespace KarhuRayTracer
         reCalculateProjection();
         return m_Projection;
     }
-    void Camera::MouseInput(float xoffset, float yoffset, bool constrainPitch)
-    {
-        xoffset *= m_Sensitivity;
-        yoffset *= m_Sensitivity;
 
-        m_Yaw += xoffset;
-        m_Pitch += yoffset;
-
-        if (constrainPitch)
-        {
-            if (m_Pitch > 89.0f)
-                m_Pitch = 89.0f;
-            if (m_Pitch < -89.0f)
-                m_Pitch = -89.0f;
-        }
-    }
     void Camera::reCalculateProjection()
     {
         m_Projection = glm::perspective(glm::radians(m_Fov), (float)m_Window.getWidth() / (float)m_Window.getHeight(), 0.1f, 100.0f);
     }
+
     void Camera::reCalculateviewMatrix()
     {
         m_ViewMatrix = glm::lookAt(m_Position, m_Position + glm::vec3(0.0f, 0.0f, -1.0f),m_CameraUp);

@@ -31,6 +31,7 @@ namespace KarhuRayTracer
 		glm::mat4 m_ViewMatrix;
 		glm::mat4 m_Projection = glm::mat4(1.0f);
 		float m_Fov;
+		float m_CameraSpeed;
 		float m_Sensitivity;
 		float m_Yaw;
 		float m_Pitch;

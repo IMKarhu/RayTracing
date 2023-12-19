@@ -2,7 +2,7 @@
 
 struct Material
 {
-	vec3 m_Albeido;
+	vec3 m_Albeido; //Color
 	vec3 m_Specular;
 	vec3 m_Emission;
 	float m_Roughness;
@@ -12,10 +12,32 @@ struct Object
 {
 	vec3 m_ObjPosition;
 	vec3 m_ObjScale;
-	vec3 m_ObjColour;
 	float m_ObjRadius;
 	Material m_ObjMaterial;
 };
+
+struct PointLight
+{
+	vec3 m_LightPosition;
+	vec3 m_LightColor;
+	float m_LightRadius;
+};
+
+struct Ray
+{
+	vec3 RayOrigin;
+	vec3 RayDirection;
+};
+
+struct hitPoint
+{
+	float m_HitDistance;
+	vec3 m_WorldNormal;
+	vec3 m_WorldPosition;
+
+	int m_ObjectIndex;
+};
+
 
 layout(local_size_x = 8, local_size_y = 4, local_size_z = 1) in;
 layout(rgba32f, binding = 0) uniform image2D screen;
@@ -25,18 +47,19 @@ uniform vec3 CameraForward;
 uniform vec3 CameraRight;
 uniform vec3 CameraUp;
 uniform Object u_Objects[2];
+uniform PointLight u_PointLight;
 uniform Object u_Objects1;
 uniform Material u_Material;
 
 const vec3 sunDirection = normalize(vec3(2.0, 0.5, -1.0));
 
-struct Ray
-{
-	vec3 RayOrigin;
-	vec3 RayDirection;
-};
+
 
 bool hit(Ray ray, Object sphere, inout float t);
+//hitPoint RayTrace();
+vec4 perPixel(float x, float y);
+//hitPoint closestHit(Ray ray, float hitDistance, int objectIndex);
+hitPoint miss(Ray ray);
 bool boxHit(Ray ray, Object object, inout float t);
 bool planeHit(vec3 planeNormal, vec3 planePosition,Ray ray, inout float t);
 
@@ -60,21 +83,33 @@ void main()
 
 	float t = 99999;
 	float minHitDist = 10000;
-	
+	int bounces = 2;
+	vec3 color = vec3(0.0f);
+	float multiplier = 1.0f;
 	for(int i = 0; i < u_Objects.length(); ++i)
 	{
 		if(hit(m_Ray, u_Objects[i], t))
 		{
-			pixel = u_Objects[i].m_ObjColour;
-			vec3 hit_pos = m_Ray.RayOrigin + t * m_Ray.RayDirection;
-			vec3 normal = normalize(hit_pos - u_Objects[i].m_ObjPosition);
-			float light_amount = max(0.0, dot(-sunDirection, normal));
-			pixel = light_amount * u_Objects[i].m_ObjColour;
+			for(int i = 0; i < bounces; i++)
+			{
+				pixel = u_Objects[i].m_ObjMaterial.m_Albeido;
+				vec3 hit_pos = m_Ray.RayOrigin + t * m_Ray.RayDirection;
+				vec3 normal = normalize(hit_pos - u_Objects[i].m_ObjPosition);
+				float light_amount = max(0.0, dot(-u_PointLight.m_LightPosition, normal));
+				pixel = light_amount * u_Objects[i].m_ObjMaterial.m_Albeido;
+			
+				color += pixel * multiplier;
+			
+				multiplier *= 0.7;
+			
+				m_Ray.RayOrigin = hit_pos + normal * 0.0001; //Need to offset origin by very small amount so we dont hit our sphere we're trying to bounce off of.
+				m_Ray.RayDirection = reflect(m_Ray.RayDirection, normal);
+			}
 		}
 	}
 
 
-	imageStore(screen, pixel_coords, vec4(pixel, 1.0));
+	imageStore(screen, pixel_coords, vec4(color, 1.0));
 }
 
 
@@ -84,14 +119,14 @@ bool hit(Ray ray, Object sphere, inout float t)
 	float a = dot(ray.RayDirection, ray.RayDirection);
 	float b = 2 * dot(ray.RayDirection, o_c);
 	float c = dot(o_c, o_c) - sphere.m_ObjRadius * sphere.m_ObjRadius;
-	float intersectionState = b * b - 4 * a * c;
+	float intersectionState = b * b - 4 * a * c; //Quadratic formula discriminant.
 	if(intersectionState < 0)
 	{
 		return false;
+		//return miss(ray);
 	}
 
-	//vec3 intersection = ray.RayOrigin + ray.RayDirection * (-b + sqrt(b * b - c));
-	float tHit = (-b - sqrt(intersectionState)) / (2 * a);
+	float tHit = (-b - sqrt(intersectionState)) / (2 * a); //Quadratic formula.
 	if(tHit < t && tHit > 0.0001)
 	{
 		t = tHit;
@@ -103,6 +138,44 @@ bool hit(Ray ray, Object sphere, inout float t)
 	}
 	
 }
+//hitPoint RayTrace()
+//{
+//	
+//}
+
+//vec4 perPixel(float x, float y)
+//{
+//	Ray m_Ray;
+//	m_Ray.RayOrigin = CameraPosition; // oli (x,y,0.0) nyt on (0.0,0.0,1.0)
+//	m_Ray.RayDirection = normalize(CameraForward + x * CameraRight + y * CameraUp);
+//
+//	hitPoint hitpoint = hit(m_Ray);
+//
+//	float light_amount = max(0.0, dot(-sunDirection, normal));
+//	pixel = light_amount * u_Objects[i].m_ObjMaterial.m_Albeido;
+//
+//	color += pixel * multiplier;
+//
+//	multiplier *= 0.7;
+//
+//	m_Ray.RayOrigin = hit_pos + normal * 0.0001; //Need to offset origin by very small amount so we dont hit our sphere we're trying to bounce off of.
+//	m_Ray.RayDirection = reflect(m_Ray.RayDirection, normal);
+//}
+//hitPoint closestHit(Ray ray, float hitDistance, int objectIndex)
+//{
+//	pixel = u_Objects[i].m_ObjMaterial.m_Albeido;
+//	vec3 hit_pos = m_Ray.RayOrigin + t * m_Ray.RayDirection;
+//	vec3 normal = normalize(hit_pos - u_Objects[i].m_ObjPosition);
+//	float light_amount = max(0.0, dot(-sunDirection, normal));
+//	pixel = light_amount * u_Objects[i].m_ObjMaterial.m_Albeido;
+//}
+//
+//hitPoint miss(Ray ray)
+//{
+//	hitPoint hitpoint;
+//	hitpoint.m_HitDistance = -1;
+//	return hitpoint;
+//}
 
 bool boxHit(Ray ray, Object object, inout float t)
 {

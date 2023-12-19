@@ -11,18 +11,15 @@ namespace KarhuRayTracer
 		m_Shaders.push_back(Shader{ "../shaders/RayTracingKernel.comp" });
 		m_Shaders.push_back(Shader{ "../shaders/SkyBox.vert", "../shaders/SkyBox.frag" });
 
-		m_Objects.push_back({ glm::vec3(3.0f, 0.0f, 0.0f), glm::vec3(2.0, 0.0, 0.0), glm::vec3(1.0, 0.75, 0.5), 1.0f, m_Material });
-		m_Objects.push_back({ glm::vec3(6.0f, 0.0f, 0.0f), glm::vec3(2.0, 0.0, 0.0), glm::vec3(1.0, 0.75, 0.5), 1.0f, m_Material });
-		/*m_Objects.m_Position = glm::vec3(3.0f, 0.0f, 0.0f);
-		m_Objects.m_Radius = 1.0f;
-		m_Objects.m_Colour = glm::vec3(1.0, 0.75, 0.5);*/
-		//
-		/*m_Objects1.m_Position = glm::vec3(6.0f, 0.0f, 0.0f);
-		m_Objects1.m_Radius = 1.0f;
-		m_Objects1.m_Colour = glm::vec3(1.0, 0.75, 0.5);*/
-		/*m_Object.m_Position = glm::vec3(3.0f, 0.0f, 0.0f);
-		m_Object.m_Radius = 1.0f;
-		m_Object.m_Colour = glm::vec3(1.0, 0.75, 0.5);*/
+		m_Materials.push_back({ glm::vec3(1.0, 0.75, 0.5), glm::vec3(0.0f),glm::vec3(0.0f)});
+		m_Materials.push_back({ glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0f),glm::vec3(0.0f)});
+
+		m_Objects.push_back({ glm::vec3(3.0f, 0.0f, 0.0f), glm::vec3(2.0, 0.0, 0.0), 1.0f, m_Materials[0]});
+		m_Objects.push_back({ glm::vec3(6.0f, 0.0f, 0.0f), glm::vec3(2.0, 0.0, 0.0), 2.0f, m_Materials[1] });
+
+		m_PointLight.m_Position = glm::vec3(2.0f, 0.5f, -1.0f);
+		m_PointLight.m_Color = glm::vec3(0.0f, 0.0f, 0.0f);
+		m_PointLight.m_Radius = 1.0f;
 	}
 	App::~App()
 	{
@@ -37,9 +34,9 @@ namespace KarhuRayTracer
 			m_DeltaTime = currentFrame - m_LastFrame;
 
 			//m_Camera.update(m_DeltaTime);
-			m_Renderer.render(m_Shaders,m_Camera, m_Objects, m_DeltaTime);
+			m_Renderer.render(m_Shaders,m_Camera, m_Objects,m_PointLight, m_DeltaTime);
 			m_ImguiManager.begin();
-			m_ImguiManager.imguiRender(m_Objects[0].m_Position, m_DeltaTime);
+			m_ImguiManager.imguiRender(m_Objects,m_PointLight, m_DeltaTime);
 			m_ImguiManager.end();
 			//m_Camera.update(m_DeltaTime);
 

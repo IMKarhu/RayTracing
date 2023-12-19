@@ -25,9 +25,10 @@ namespace KarhuRayTracer
 		Camera m_Camera{ m_Shaders, m_Window, glm::vec3(0.0f,0.0f,0.0), glm::vec3(0.0f,0.0f,1.0f), 45.0f };
 		Renderer m_Renderer{ m_Window };
 		ImguiManager m_ImguiManager{ m_Window, m_Renderer };
-		Material m_Material;
+
+		std::vector<Material> m_Materials;
 		std::vector<Object> m_Objects;
-		Object m_Objects1;
+		PointLight m_PointLight;
 
 		float m_DeltaTime = 0.0f;
 		float m_LastFrame = 0.0f;

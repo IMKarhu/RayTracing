@@ -12,33 +12,21 @@ namespace KarhuRayTracer
 {
 	Material m_Material;
 	extern Object m_Object;
-	
-	/*Object::Object(){}
-	Object::Object(glm::vec3& position, glm::vec3& scale, glm::vec3& colour, float radius, Material material)
-	{
-		m_Position = position;
-		m_Scale = scale;
-		m_Material = material;
-		m_Colour = colour;
-		m_Radius = radius;
-	}*/
 
-	void bind(Shader& m_Shader, std::vector<Object> objects)
+	void bind(Shader& m_Shader, std::vector<Object> objects, PointLight light)
 	{
 		for (int i = 0; i < objects.size(); i++)
 		{
 			std::string index = std::to_string(i);
 			m_Shader.setCUniformVec3(std::string("u_Objects[").append(index).append("].m_ObjPosition"), objects[i].m_Position);
 			m_Shader.setCUniformVec3(std::string("u_Objects[").append(index).append("].m_ObjScale"), objects[i].m_Scale);
-			m_Shader.setCUniformVec3(std::string("u_Objects[").append(index).append("].m_ObjColour"), objects[i].m_Colour);
 			m_Shader.setCUniformfloat(std::string("u_Objects[").append(index).append("].m_ObjRadius"), objects[i].m_Radius);
+			m_Shader.setCUniformVec3(std::string("u_Objects[").append(index).append("].m_ObjMaterial.m_Albeido"), objects[i].m_Material.m_Albeido);
+			m_Shader.setCUniformfloat(std::string("u_Objects[").append(index).append("].m_ObjMaterial.m_Roughness"), objects[i].m_Material.m_Roughness);
 		}
-	}
-	void bind1(Shader& m_Shader, Object object)
-	{
-		m_Shader.setCUniformVec3("u_Objects1.position", object.m_Position);
-		m_Shader.setCUniformVec3("u_Objects1.scale", object.m_Scale);
-		m_Shader.setCUniformVec3("u_Objects1.colour", object.m_Colour);
-		m_Shader.setCUniformfloat("u_Objects1.radius", object.m_Radius);
+
+		m_Shader.setCUniformVec3("u_PointLight.m_LightPosition", light.m_Position);
+		m_Shader.setCUniformVec3("u_PointLight.m_LightColor", light.m_Color);
+		m_Shader.setCUniformfloat("u_PointLight.m_LightRadius", light.m_Radius);
 	}
 }

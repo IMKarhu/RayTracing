@@ -11,13 +11,13 @@ namespace KarhuRayTracer
 		glm::vec3 m_Albeido;
 		glm::vec3 m_Specular;
 		glm::vec3 m_Emission;
-		float m_Roughness;
+		float m_Roughness = 0.5f;
 	};
+
 	struct Object
 	{
 		glm::vec3 m_Position;
 		glm::vec3 m_Scale;
-		glm::vec3 m_Colour;
 		float m_Radius;
 		Material m_Material;
 
@@ -25,9 +25,15 @@ namespace KarhuRayTracer
 		Object(glm::vec3& position, glm::vec3& scale, glm::vec3& colour, float radius, Material material);*/
 	};
 
+	struct PointLight
+	{
+		glm::vec3 m_Position;
+		glm::vec3 m_Color;
+		float m_Radius;
+	};
+
 	
 	
 
-	void bind(Shader& m_Shader, std::vector<Object> objects);
-	void bind1(Shader& m_Shader, Object object);
+	void bind(Shader& m_Shader, std::vector<Object> objects, PointLight light);
 }

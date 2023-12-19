@@ -54,11 +54,11 @@ namespace KarhuRayTracer
 			glfwMakeContextCurrent(backup_current_context);
 		}
 	}
-	void ImguiManager::imguiRender(glm::vec3& position, float deltatime)
+	void ImguiManager::imguiRender(std::vector<Object>& objects, PointLight& light, float deltatime)
 	{
 		//dockSpace(open);
 		//viewport(open);
-		ObjectSettings(position, deltatime);
+		ObjectSettings(objects,light, deltatime);
 		ImGui::ShowDemoWindow(&show_demo_window);
 	}
 	void ImguiManager::dockSpace(bool& show)
@@ -106,11 +106,25 @@ namespace KarhuRayTracer
 		ImGui::End();
 	}
 
-	void ImguiManager::ObjectSettings(glm::vec3& position, float deltatime)
+	void ImguiManager::ObjectSettings(std::vector<Object>& objects,PointLight& light, float deltatime)
 	{
 		ImGui::Begin("Settings");
 		ImGui::Text("Render: %.3fms", deltatime);
-		ImGui::SliderFloat("Position X", &position.x, 0.0f, 100.0f);
+		for (size_t i = 0; i < objects.size(); i++)
+		{
+			ImGui::PushID(i);
+
+			ImGui::DragFloat3("Position", glm::value_ptr(objects[i].m_Position), 0.1f);
+			ImGui::ColorEdit3("Albeido", glm::value_ptr(objects[i].m_Material.m_Albeido));
+			ImGui::SliderFloat("Radius", &objects[i].m_Radius, 0.1f, 10.0f);
+
+			ImGui::Separator();
+			ImGui::PopID();
+		}
+		ImGui::DragFloat3("Position", glm::value_ptr(light.m_Position), 0.1f);
+		ImGui::ColorEdit3("Albeido", glm::value_ptr(light.m_Color));
+		ImGui::SliderFloat("Radius", &light.m_Radius, 0.1f, 10.0f);
+		
 		ImGui::End();
 	}
 

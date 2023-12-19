@@ -3,6 +3,9 @@
 #include "imgui_impl_opengl3.h"
 #include "imgui_impl_glfw.h"
 #include "glm/glm.hpp"
+#include "glm/gtc/type_ptr.hpp"
+
+#include "gameObject.h"
 
 namespace KarhuRayTracer
 {
@@ -17,10 +20,10 @@ namespace KarhuRayTracer
 
 		void begin();
 		void end();
-		void imguiRender(glm::vec3& position, float deltatime);
+		void imguiRender(std::vector<Object>& objects, PointLight& light, float deltatime);
 		void dockSpace(bool &show);
 		void viewport(bool& show);
-		void ObjectSettings(glm::vec3& position, float deltatime);
+		void ObjectSettings(std::vector<Object>& objects, PointLight& light, float deltatime);
 		ImVec2 viewportSize();
 		ImVec2 centeredviewport(ImVec2 aspect);
 	private:

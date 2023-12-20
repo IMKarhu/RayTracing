@@ -13,7 +13,15 @@ struct Object
 	vec3 m_ObjPosition;
 	vec3 m_ObjScale;
 	float m_ObjRadius;
+	int m_ObjType;
 	Material m_ObjMaterial;
+
+	// Plane stuff
+	vec3 m_ObjTangent;
+	vec3 m_ObjBiTangent;
+	vec3 m_ObjNormal;
+	float m_ObjUmax, m_ObjUmin;
+	float m_ObjVmax, m_ObjVmin;
 };
 
 struct PointLight
@@ -34,8 +42,19 @@ struct hitPoint
 	float m_HitDistance;
 	vec3 m_WorldNormal;
 	vec3 m_WorldPosition;
+	vec3 m_WorldColor;
 
 	int m_ObjectIndex;
+};
+
+struct RenderData
+{
+	float m_Rt;
+	vec3 m_RColor;
+	bool m_RHit;
+
+	vec3 m_RNormal;
+	vec3 m_RPosition;
 };
 
 
@@ -48,20 +67,15 @@ uniform vec3 CameraRight;
 uniform vec3 CameraUp;
 uniform Object u_Objects[2];
 uniform PointLight u_PointLight;
-uniform Object u_Objects1;
 uniform Material u_Material;
 
 const vec3 sunDirection = normalize(vec3(2.0, 0.5, -1.0));
 
 
-
-bool hit(Ray ray, Object sphere, inout float t);
-//hitPoint RayTrace();
-vec4 perPixel(float x, float y);
-//hitPoint closestHit(Ray ray, float hitDistance, int objectIndex);
-hitPoint miss(Ray ray);
+vec3 RayCast(Ray ray);
+void hit(Ray ray, Object sphere, in float t, inout RenderData renderdata);
 bool boxHit(Ray ray, Object object, inout float t);
-bool planeHit(vec3 planeNormal, vec3 planePosition,Ray ray, inout float t);
+void planeHit(Object plane, Ray ray, in float tMin, in float tMax, inout RenderData renderdata);
 
 void main()
 {
@@ -81,109 +95,131 @@ void main()
 	m_Ray.RayOrigin = CameraPosition; // oli (x,y,0.0) nyt on (0.0,0.0,1.0)
 	m_Ray.RayDirection = normalize(CameraForward + x * CameraRight + y * CameraUp);
 
-	float t = 99999;
-	float minHitDist = 10000;
 	int bounces = 2;
-	vec3 color = vec3(0.0f);
+	vec3 color = vec3(0.0);
 	float multiplier = 1.0f;
-	for(int i = 0; i < u_Objects.length(); ++i)
+	float minHitDist = 10000;
+	
+	
+	
+		
+////				color += pixel * multiplier;
+////			
+////				multiplier *= 0.2;
+////			
+////				m_Ray.RayOrigin = hit_pos + normal * 0.0001; //Need to offset origin by very small amount so we dont hit our sphere we're trying to bounce off of.
+////				m_Ray.RayDirection = reflect(m_Ray.RayDirection, normal); // reflect() I - 2.0 * dot(N, I) * N from khronos reference page.
+
+	pixel = RayCast(m_Ray);
+
+
+	imageStore(screen, pixel_coords, vec4(pixel, 1.0));
+}
+
+vec3 RayCast(Ray ray)
+{
+	vec3 color = vec3(0.0); // Vector where we store our colors
+	float ClosestT = 999999; // Closest hit
+	RenderData m_RenderData;
+	m_RenderData.m_Rt = 99999;
+	bool hitOrnot = false;
+
+	for(int i = 0; i < u_Objects.length(); i++)
 	{
-		if(hit(m_Ray, u_Objects[i], t))
+		if(u_Objects[i].m_ObjType == 0)
 		{
-			for(int i = 0; i < bounces; i++)
+			hit(ray, u_Objects[i], ClosestT, m_RenderData);
+			if(m_RenderData.m_RHit)
 			{
-				pixel = u_Objects[i].m_ObjMaterial.m_Albeido;
-				vec3 hit_pos = m_Ray.RayOrigin + t * m_Ray.RayDirection;
-				vec3 normal = normalize(hit_pos - u_Objects[i].m_ObjPosition);
-				float light_amount = max(0.0, dot(-u_PointLight.m_LightPosition, normal));
-				pixel = light_amount * u_Objects[i].m_ObjMaterial.m_Albeido;
-			
-				color += pixel * multiplier;
-			
-				multiplier *= 0.7;
-			
-				m_Ray.RayOrigin = hit_pos + normal * 0.0001; //Need to offset origin by very small amount so we dont hit our sphere we're trying to bounce off of.
-				m_Ray.RayDirection = reflect(m_Ray.RayDirection, normal);
+				ClosestT = m_RenderData.m_Rt;
+				hitOrnot = true;
+			}
+		}
+	}
+	for(int i = 0; i < u_Objects.length(); i++)
+	{
+		if(u_Objects[i].m_ObjType == 1)
+		{
+			planeHit(u_Objects[i], ray, 0.001, ClosestT, m_RenderData);
+			if(m_RenderData.m_RHit)
+			{
+				ClosestT = m_RenderData.m_Rt;
+				hitOrnot = true;
 			}
 		}
 	}
 
-
-	imageStore(screen, pixel_coords, vec4(color, 1.0));
+	if(hitOrnot)
+	{
+		color = m_RenderData.m_RColor;
+	}
+	return color;
 }
 
-
-bool hit(Ray ray, Object sphere, inout float t)
+void hit(Ray ray, Object sphere, in float t, inout RenderData renderdata)
 {
 	vec3 o_c = ray.RayOrigin - sphere.m_ObjPosition;
 	float a = dot(ray.RayDirection, ray.RayDirection);
 	float b = 2 * dot(ray.RayDirection, o_c);
 	float c = dot(o_c, o_c) - sphere.m_ObjRadius * sphere.m_ObjRadius;
 	float intersectionState = b * b - 4 * a * c; //Quadratic formula discriminant.
-	if(intersectionState < 0)
+	if(intersectionState > 0)
 	{
-		return false;
-		//return miss(ray);
+		float tHit = (-b - sqrt(intersectionState)) / (2 * a); //Quadratic formula.
+		if(tHit < t && tHit > 0.0001)
+		{
+			renderdata.m_Rt = tHit;
+			renderdata.m_RColor = sphere.m_ObjMaterial.m_Albeido;
+			renderdata.m_RPosition = ray.RayOrigin + renderdata.m_Rt * ray.RayDirection;
+			renderdata.m_RNormal = normalize(renderdata.m_RPosition - sphere.m_ObjPosition);
+			float light_amount = max(0.0, dot(-u_PointLight.m_LightPosition, renderdata.m_RNormal));
+			renderdata.m_RColor *= light_amount;
+			renderdata.m_RHit = true;
+			return;
+		}
 	}
 
-	float tHit = (-b - sqrt(intersectionState)) / (2 * a); //Quadratic formula.
-	if(tHit < t && tHit > 0.0001)
-	{
-		t = tHit;
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-	
+	renderdata.m_RHit = false;
 }
-//hitPoint RayTrace()
-//{
-//	
-//}
 
-//vec4 perPixel(float x, float y)
-//{
-//	Ray m_Ray;
-//	m_Ray.RayOrigin = CameraPosition; // oli (x,y,0.0) nyt on (0.0,0.0,1.0)
-//	m_Ray.RayDirection = normalize(CameraForward + x * CameraRight + y * CameraUp);
-//
-//	hitPoint hitpoint = hit(m_Ray);
-//
-//	float light_amount = max(0.0, dot(-sunDirection, normal));
-//	pixel = light_amount * u_Objects[i].m_ObjMaterial.m_Albeido;
-//
-//	color += pixel * multiplier;
-//
-//	multiplier *= 0.7;
-//
-//	m_Ray.RayOrigin = hit_pos + normal * 0.0001; //Need to offset origin by very small amount so we dont hit our sphere we're trying to bounce off of.
-//	m_Ray.RayDirection = reflect(m_Ray.RayDirection, normal);
-//}
-//hitPoint closestHit(Ray ray, float hitDistance, int objectIndex)
-//{
-//	pixel = u_Objects[i].m_ObjMaterial.m_Albeido;
-//	vec3 hit_pos = m_Ray.RayOrigin + t * m_Ray.RayDirection;
-//	vec3 normal = normalize(hit_pos - u_Objects[i].m_ObjPosition);
-//	float light_amount = max(0.0, dot(-sunDirection, normal));
-//	pixel = light_amount * u_Objects[i].m_ObjMaterial.m_Albeido;
-//}
-//
-//hitPoint miss(Ray ray)
-//{
-//	hitPoint hitpoint;
-//	hitpoint.m_HitDistance = -1;
-//	return hitpoint;
-//}
+void planeHit(Object plane, Ray ray, in float tMin, in float tMax, inout RenderData renderdata)
+{
+	float denom = dot(plane.m_ObjNormal, ray.RayDirection); 
+    if (abs(denom) < 0.000001) { 
+        vec3 d = plane.m_ObjPosition - ray.RayOrigin; 
+        float t = dot(d, plane.m_ObjNormal) / denom;  
+    
+		if(t > tMin && t < tMax)
+		{
+		  vec3 testPoint = ray.RayOrigin + t * ray.RayDirection;
+          vec3 testDirection = testPoint - plane.m_ObjNormal;
+
+            float u = dot(testDirection, plane.m_ObjTangent);
+            float v = dot(testDirection, plane.m_ObjBiTangent);
+
+            if (u >  plane.m_ObjUmin && u < plane.m_ObjUmax && v > plane.m_ObjVmin && v < plane.m_ObjVmax) {
+                renderdata.m_Rt = t;
+				renderdata.m_RColor = plane.m_ObjMaterial.m_Albeido;
+				renderdata.m_RPosition = ray.RayOrigin + renderdata.m_Rt * ray.RayDirection;
+				renderdata.m_RNormal = normalize(renderdata.m_RPosition - plane.m_ObjPosition);
+				float light_amount = max(0.0, dot(-u_PointLight.m_LightPosition, renderdata.m_RNormal));
+				renderdata.m_RColor *= light_amount;
+				renderdata.m_RHit = true;
+				return;
+            }
+		}
+	}
+	renderdata.m_RHit = false;
+}
+
 
 bool boxHit(Ray ray, Object object, inout float t)
 {
 	float t1 = -1000000000000.0;
     float t2 = 1000000000000.0;
 
-	vec3 boxMin = object.m_ObjPosition - object.m_ObjScale / 2.0;
-	vec3 boxMax = object.m_ObjPosition + object.m_ObjScale / 2.0;
+	vec3 boxMin = object.m_ObjPosition - object.m_ObjScale / 2.0; // 6.0f, -1.0f, 0.0f - 2.0, 1.0, 1.0 / 2.0 = 5.0, -1.5, -0.5
+	vec3 boxMax = object.m_ObjPosition + object.m_ObjScale / 2.0; // 6.0f, -1.0f, 0.0f + 2.0, 1.0, 1.0 / 2.0 = 7.0, 0.5, 0.5
 
 	vec3 t0s = (boxMin - ray.RayOrigin) / ray.RayDirection;
     vec3 t1s = (boxMax - ray.RayOrigin) / ray.RayDirection;
@@ -199,14 +235,3 @@ bool boxHit(Ray ray, Object object, inout float t)
 	return t1 >= 0 && t1 <= t2;
 }
 
-bool planeHit(vec3 planeNormal, vec3 planePosition,Ray ray, inout float t)
-{
-	float denom = dot(planeNormal, ray.RayDirection); 
-    if (abs(denom) > 0.0001) { 
-        vec3 d = planePosition - ray.RayOrigin; 
-        t = dot(d, planeNormal) / denom; 
-        return (t >= 0.0001); 
-    } 
- 
-    return false; 
-}

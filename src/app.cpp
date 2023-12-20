@@ -13,11 +13,14 @@ namespace KarhuRayTracer
 
 		m_Materials.push_back({ glm::vec3(1.0, 0.75, 0.5), glm::vec3(0.0f),glm::vec3(0.0f)});
 		m_Materials.push_back({ glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0f),glm::vec3(0.0f)});
+		m_Materials.push_back({ glm::vec3(1.0, 1.0, 1.0), glm::vec3(0.0f),glm::vec3(0.0f)});
 
-		m_Objects.push_back({ glm::vec3(3.0f, 0.0f, 0.0f), glm::vec3(2.0, 0.0, 0.0), 1.0f, m_Materials[0]});
-		m_Objects.push_back({ glm::vec3(6.0f, 0.0f, 0.0f), glm::vec3(2.0, 0.0, 0.0), 2.0f, m_Materials[1] });
+		m_Objects.push_back({ glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(2.0, 0.0, 0.0), 1.0f, 0, m_Materials[0]});
+		m_Objects.push_back({ glm::vec3(3.0f, 0.0f, 0.0f), glm::vec3(2.0, 0.0, 0.0), 2.0f, 0, m_Materials[1] });
+		m_Objects.push_back({ glm::vec3(0.0f, 0.0f, -2.0f), glm::vec3(2.0, 1.0, 1.0), 2.0f, 1, m_Materials[2],
+									glm::vec3(1.0f,0.0f,0.0f),glm::vec3(0.0f,1.0f,0.0f),glm::vec3(0.0f,0.0f,1.0f),-10,10,-10,10});
 
-		m_PointLight.m_Position = glm::vec3(2.0f, 0.5f, -1.0f);
+		m_PointLight.m_Position = glm::vec3(0.0f, 0.0f, -1.0f);
 		m_PointLight.m_Color = glm::vec3(0.0f, 0.0f, 0.0f);
 		m_PointLight.m_Radius = 1.0f;
 	}

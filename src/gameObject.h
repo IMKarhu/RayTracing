@@ -16,13 +16,25 @@ namespace KarhuRayTracer
 
 	struct Object
 	{
+		
 		glm::vec3 m_Position;
 		glm::vec3 m_Scale;
 		float m_Radius;
+		int m_Type;
 		Material m_Material;
 
-		/*Object();
-		Object(glm::vec3& position, glm::vec3& scale, glm::vec3& colour, float radius, Material material);*/
+		/* Plane only. */
+
+		glm::vec3 m_Tangent;
+		glm::vec3 m_BiTangent;
+		glm::vec3 m_Normal;
+		float m_Umin, m_Umax;
+		float m_Vmin, m_Vmax;
+	};
+
+	struct Plane
+	{
+		
 	};
 
 	struct PointLight

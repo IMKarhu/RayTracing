@@ -76,28 +76,20 @@ namespace KarhuRayTracer
 		glDeleteBuffers(1, &m_VBO);
 		glDeleteBuffers(1, &m_EBO);
 	}
-	void Renderer::render(std::vector<Shader>& m_Shaders, Camera& m_Camera, Object m_Object, float dt)
+	void Renderer::render(std::vector<Shader>& m_Shaders, Camera& m_Camera, std::vector<Object> objects, PointLight& light, float dt)
 	{
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-		glm::mat4 projection = glm::mat4(1.0f);
-		projection = glm::perspective(glm::radians(45.0f), (float)m_Window.getWidth() / (float)m_Window.getHeight(), 0.1f, 100.0f);
-
-		/*glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
-		GLvoid* p = glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_WRITE_ONLY);
-		memcpy(p, &m_Object, sizeof(m_Object));
-		glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);*/
 		
 		m_Shaders[1].use_compute(ceil(m_Window.getWidth() / 8), ceil(m_Window.getHeight() / 4));
-		bind(m_Shaders[1], m_Object);
+		bind(m_Shaders[1], objects, light);
 		m_Camera.update(dt);
 		m_Shaders[0].use();
 		
 		glBindTextureUnit(0, texture);
 		m_Shaders[0].setUniformTexture("screen", 0);
 		m_Shaders[0].setUniformMat4("view", m_Camera.getViewMatrix());
-		m_Shaders[0].setUniformMat4("projection", projection);
+		m_Shaders[0].setUniformMat4("projection", m_Camera.getProjectionMatrix());
 		glBindVertexArray(m_VAO);
 		glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(indices[0]), GL_UNSIGNED_INT, 0);
 

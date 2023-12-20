@@ -21,6 +21,7 @@ namespace KarhuRayTracer
 		/* Compute. */
 		void setCUniformVec3(const std::string& name, const glm::vec3& vec3);
 		void setCUniformfloat(const std::string& name, const float& value);
+		void setCUniformInt(const std::string& name, const int& value);
 
 	private:
 		unsigned int m_VertexShader;

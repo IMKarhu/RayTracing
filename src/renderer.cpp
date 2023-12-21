@@ -81,7 +81,7 @@ namespace KarhuRayTracer
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
-		m_Shaders[1].use_compute(ceil(m_Window.getWidth() / 8), ceil(m_Window.getHeight() / 4));
+		m_Shaders[1].use_compute(ceil((float)m_Window.getWidth() / 8), ceil((float)m_Window.getHeight() / 4));
 		bind(m_Shaders[1], objects, light);
 		m_Camera.update(dt);
 		m_Shaders[0].use();

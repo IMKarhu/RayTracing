@@ -32,11 +32,6 @@ namespace KarhuRayTracer
 		float m_Vmin, m_Vmax;
 	};
 
-	struct Plane
-	{
-		
-	};
-
 	struct PointLight
 	{
 		glm::vec3 m_Position;

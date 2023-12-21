@@ -95,7 +95,7 @@ void main()
 	m_Ray.RayOrigin = CameraPosition; // oli (x,y,0.0) nyt on (0.0,0.0,1.0)
 	m_Ray.RayDirection = normalize(CameraForward + x * CameraRight + y * CameraUp);
 
-	int bounces = 2;
+	int bounces = 4;
 	vec3 color = vec3(1.0);
 	float multiplier = 1.0f;
 	float minHitDist = 10000;
@@ -110,6 +110,8 @@ void main()
 		}
 
 		color = color * m_RenderData.m_RColor;
+
+		
 
 		m_Ray.RayOrigin = m_RenderData.m_RPosition + m_RenderData.m_RNormal * 0.00001;
         m_Ray.RayDirection = reflect(m_Ray.RayDirection, m_RenderData.m_RNormal);
@@ -184,8 +186,9 @@ void hit(Ray ray, Object sphere, in float t, inout RenderData renderdata)
 				renderdata.m_RColor = sphere.m_ObjMaterial.m_Albeido;
 				renderdata.m_RPosition = ray.RayOrigin + renderdata.m_Rt * ray.RayDirection;
 				renderdata.m_RNormal = normalize(renderdata.m_RPosition - sphere.m_ObjPosition);
-				float light_amount = max(0.0, dot(-u_PointLight.m_LightPosition, renderdata.m_RNormal));
-				renderdata.m_RColor *= light_amount;
+				//float light_amount = max(0.0, dot(-u_PointLight.m_LightPosition, renderdata.m_RNormal));
+//				*= light_amount
+				renderdata.m_RColor;
 
 				renderdata.m_RHit = true;
 				return;

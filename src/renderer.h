@@ -30,7 +30,7 @@ namespace KarhuRayTracer
 		unsigned int m_VAO;
 		unsigned int m_VBO; /* Vertex buffer object. */
 		unsigned int m_EBO; /* Element buffer object. */
-		unsigned int ssbo;
+		unsigned int ssbo = 0;
 		unsigned int texture;
 	};
 }

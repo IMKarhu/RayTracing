@@ -50,11 +50,13 @@ struct hitPoint
 struct RenderData
 {
 	float m_Rt;
-	vec3 m_RColor;
+	vec3 m_RColor; //RenderColor
 	bool m_RHit;
 
 	vec3 m_RNormal;
 	vec3 m_RPosition;
+
+	int m_RIndex;
 };
 
 
@@ -68,14 +70,18 @@ uniform vec3 CameraUp;
 uniform Object u_Objects[2];
 uniform PointLight u_PointLight;
 uniform Material u_Material;
+uniform samplerCube u_SkyBox;
 
 const vec3 sunDirection = normalize(vec3(2.0, 0.5, -1.0));
 
 
 RenderData RayCast(Ray ray);
-void hit(Ray ray, Object sphere, in float t, inout RenderData renderdata);
+void hit(Ray ray, int sphereIndex, in float t, inout RenderData renderdata);
 bool boxHit(Ray ray, Object object, inout float t);
 void planeHit(Object plane, Ray ray, in float tMin, in float tMax, inout RenderData renderdata);
+
+vec3 scatter(inout Ray ray, RenderData renderdata, inout float reflectance);
+vec3 miss(Ray ray);
 
 void main()
 {
@@ -96,35 +102,26 @@ void main()
 	m_Ray.RayDirection = normalize(CameraForward + x * CameraRight + y * CameraUp);
 
 	int bounces = 4;
-	vec3 color = vec3(1.0);
-	float multiplier = 1.0f;
+	vec3 color = vec3(0.0);
+	float multiplier = 1.0f; //reflectance
 	float minHitDist = 10000;
 
 	for(int i = 0; i < bounces; i++)
 	{
 		RenderData m_RenderData = RayCast(m_Ray);
 
-		if(!m_RenderData.m_RHit)
+		if(m_RenderData.m_RHit)
 		{
+			color = color + scatter(m_Ray,m_RenderData,multiplier);
+		}
+		else
+		{
+			color = color + miss(m_Ray) * multiplier;
 			break;
 		}
-
-		color = color * m_RenderData.m_RColor;
-
-		
-
-		m_Ray.RayOrigin = m_RenderData.m_RPosition + m_RenderData.m_RNormal * 0.00001;
-        m_Ray.RayDirection = reflect(m_Ray.RayDirection, m_RenderData.m_RNormal);
 	}
-		
-////				color += pixel * multiplier;
-////			
-////				multiplier *= 0.2;
-////			
 ////				m_Ray.RayOrigin = hit_pos + normal * 0.0001; //Need to offset origin by very small amount so we dont hit our sphere we're trying to bounce off of.
 ////				m_Ray.RayDirection = reflect(m_Ray.RayDirection, normal); // reflect() I - 2.0 * dot(N, I) * N from khronos reference page.
-
-	//pixel = RayCast(m_Ray);
 
 
 	imageStore(screen, pixel_coords, vec4(color, 1.0));
@@ -142,7 +139,7 @@ RenderData RayCast(Ray ray)
 	{
 		if(u_Objects[i].m_ObjType == 0)
 		{
-			hit(ray, u_Objects[i], ClosestT, m_RenderData);
+			hit(ray, i, ClosestT, m_RenderData);
 			if(m_RenderData.m_RHit)
 			{
 				ClosestT = m_RenderData.m_Rt;
@@ -167,8 +164,9 @@ RenderData RayCast(Ray ray)
 	return m_RenderData;
 }
 
-void hit(Ray ray, Object sphere, in float t, inout RenderData renderdata)
+void hit(Ray ray, int sphereIndex, in float t, inout RenderData renderdata)
 {
+	Object sphere = u_Objects[sphereIndex];
 	int bounces = 2;
 	float multiplier = 1.0;
 	vec3 color = vec3(0.0);
@@ -183,13 +181,7 @@ void hit(Ray ray, Object sphere, in float t, inout RenderData renderdata)
 		if(tHit < t && tHit > 0.0001)
 		{
 				renderdata.m_Rt = tHit;
-				renderdata.m_RColor = sphere.m_ObjMaterial.m_Albeido;
-				renderdata.m_RPosition = ray.RayOrigin + renderdata.m_Rt * ray.RayDirection;
-				renderdata.m_RNormal = normalize(renderdata.m_RPosition - sphere.m_ObjPosition);
-				//float light_amount = max(0.0, dot(-u_PointLight.m_LightPosition, renderdata.m_RNormal));
-//				*= light_amount
-				renderdata.m_RColor;
-
+				renderdata.m_RIndex = sphereIndex;
 				renderdata.m_RHit = true;
 				return;
 		}
@@ -251,3 +243,25 @@ bool boxHit(Ray ray, Object object, inout float t)
 	return t1 >= 0 && t1 <= t2;
 }
 
+vec3 scatter(inout Ray ray, RenderData renderdata, inout float reflectance)
+{
+	Object sphere = u_Objects[renderdata.m_RIndex];
+	vec3 hitPos = ray.RayOrigin + renderdata.m_Rt * ray.RayDirection;
+	vec3 normal = normalize(hitPos - sphere.m_ObjPosition);
+
+	vec3 color = sphere.m_ObjMaterial.m_Albeido;
+	float localReflectance = sphere.m_ObjMaterial.m_Roughness;
+
+	color = color * (1.0 - localReflectance) * reflectance;
+
+	reflectance = reflectance * localReflectance;
+
+	ray.RayOrigin = hitPos;
+    ray.RayDirection = normalize(reflect(ray.RayDirection, normal));
+	return color;
+}
+
+vec3 miss(Ray ray)
+{
+	return vec3(texture(u_SkyBox,ray.RayDirection));
+}

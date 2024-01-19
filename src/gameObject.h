@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <string>
 #include <glm/glm.hpp>
 
 namespace KarhuRayTracer
@@ -39,8 +40,17 @@ namespace KarhuRayTracer
 		float m_Radius;
 	};
 
-	
+	class CubeMaterial
+	{
+	public:
+		CubeMaterial();
+		~CubeMaterial();
+
+		unsigned int createCubeMap(std::vector<std::string> faces);
+	private:
+		
+	};
 	
 
-	void bind(Shader& m_Shader, std::vector<Object> objects, PointLight light);
+	void bind(Shader& m_Shader, std::vector<Object> objects, PointLight light, unsigned int TextureID);
 }

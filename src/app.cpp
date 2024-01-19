@@ -23,6 +23,8 @@ namespace KarhuRayTracer
 		m_PointLight.m_Position = glm::vec3(0.0f, 0.0f, -1.0f);
 		m_PointLight.m_Color = glm::vec3(0.0f, 0.0f, 0.0f);
 		m_PointLight.m_Radius = 1.0f;
+
+		m_TextureID = m_CubeMapMaterial.createCubeMap(m_CubeMapFaces);
 	}
 	App::~App()
 	{
@@ -37,7 +39,7 @@ namespace KarhuRayTracer
 			m_DeltaTime = currentFrame - m_LastFrame;
 
 			//m_Camera.update(m_DeltaTime);
-			m_Renderer.render(m_Shaders,m_Camera, m_Objects,m_PointLight, m_DeltaTime);
+			m_Renderer.render(m_Shaders,m_Camera, m_Objects,m_PointLight, m_TextureID, m_DeltaTime);
 			m_ImguiManager.begin();
 			m_ImguiManager.imguiRender(m_Objects,m_PointLight, m_DeltaTime);
 			m_ImguiManager.end();

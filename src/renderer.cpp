@@ -76,13 +76,13 @@ namespace KarhuRayTracer
 		glDeleteBuffers(1, &m_VBO);
 		glDeleteBuffers(1, &m_EBO);
 	}
-	void Renderer::render(std::vector<Shader>& m_Shaders, Camera& m_Camera, std::vector<Object> objects, PointLight& light, float dt)
+	void Renderer::render(std::vector<Shader>& m_Shaders, Camera& m_Camera, std::vector<Object> objects, PointLight& light, unsigned int textureID, float dt)
 	{
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
 		m_Shaders[1].use_compute(ceil((float)m_Window.getWidth() / 8), ceil((float)m_Window.getHeight() / 4));
-		bind(m_Shaders[1], objects, light);
+		bind(m_Shaders[1], objects, light, textureID);
 		m_Camera.update(dt);
 		m_Shaders[0].use();
 		

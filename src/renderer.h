@@ -17,7 +17,7 @@ namespace KarhuRayTracer
 		Renderer(Window& window);
 		~Renderer();
 
-		void render(std::vector<Shader>& m_Shaders, Camera& m_Camera,std::vector<Object> objects, PointLight& light, float dt);
+		void render(std::vector<Shader>& m_Shaders, Camera& m_Camera,std::vector<Object> objects, PointLight& light, unsigned int textureID, float dt);
 		void update(float dt);
 		void rescaleFrameBuffer(float width, float height);
 

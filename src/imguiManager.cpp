@@ -116,6 +116,7 @@ namespace KarhuRayTracer
 
 			ImGui::DragFloat3("Position", glm::value_ptr(objects[i].m_Position), 0.1f);
 			ImGui::ColorEdit3("Albeido", glm::value_ptr(objects[i].m_Material.m_Albeido));
+			ImGui::SliderFloat("Roughness", &objects[i].m_Material.m_Roughness, 0.0f, 1.0f);
 			ImGui::SliderFloat("Radius", &objects[i].m_Radius, 0.1f, 100.0f);
 
 			ImGui::Separator();

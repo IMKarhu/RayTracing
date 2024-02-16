@@ -170,7 +170,7 @@ void hit(Ray ray, int sphereIndex, in float t, inout RenderData renderdata)
 		}
 		//renderdata.m_RHit = false;
 	}
-	if(sphere.m_ObjType == 1)
+	if(sphere.m_ObjType == 1) // this doesnt work
 	{
 		float denom = dot(sphere.m_ObjNormal, ray.RayDirection); 
 		if (abs(denom) < 0.000001)

@@ -101,7 +101,7 @@ void main()
 	m_Ray.RayOrigin = CameraPosition; // oli (x,y,0.0) nyt on (0.0,0.0,1.0)
 	m_Ray.RayDirection = normalize(CameraForward + x * CameraRight + y * CameraUp);
 
-	int bounces = 4;
+	int bounces = 50;
 	vec3 color = vec3(0.0);
 	float multiplier = 1.0f; //reflectance
 	float minHitDist = 10000;
@@ -170,33 +170,33 @@ void hit(Ray ray, int sphereIndex, in float t, inout RenderData renderdata)
 		}
 		//renderdata.m_RHit = false;
 	}
-	if(sphere.m_ObjType == 1) // this doesnt work
-	{
-		float denom = dot(sphere.m_ObjNormal, ray.RayDirection); 
-		if (abs(denom) < 0.000001)
-		{ 
-			vec3 d = sphere.m_ObjPosition - ray.RayOrigin; 
-			float t = dot(d, sphere.m_ObjNormal) / denom;  
-    
-			if(t > 0.001 && t < 999999)
-			{
-				vec3 testPoint = ray.RayOrigin + t * ray.RayDirection;
-				vec3 testDirection = testPoint - sphere.m_ObjPosition;
-
-				float u = dot(testDirection, sphere.m_ObjTangent);
-				float v = dot(testDirection, sphere.m_ObjBiTangent);
-
-				if (u >  sphere.m_ObjUmin && u < sphere.m_ObjUmax && v > sphere.m_ObjVmin && v < sphere.m_ObjVmax)
-				{
-					renderdata.m_Rt = t;
-					renderdata.m_RIndex = sphereIndex;
-					renderdata.m_RHit = true;
-					return;
-				}
-			}
-		}
-		//renderdata.m_RHit = false;
-	}
+//	if(sphere.m_ObjType == 1) // this doesnt work
+//	{
+//		float denom = dot(sphere.m_ObjNormal, ray.RayDirection); 
+//		if (abs(denom) < 0.000001)
+//		{ 
+//			vec3 d = sphere.m_ObjPosition - ray.RayOrigin; 
+//			float t = dot(d, sphere.m_ObjNormal) / denom;  
+//    
+//			if(t > 0.001 && t < 999999)
+//			{
+//				vec3 testPoint = ray.RayOrigin + t * ray.RayDirection;
+//				vec3 testDirection = testPoint - sphere.m_ObjPosition;
+//
+//				float u = dot(testDirection, sphere.m_ObjTangent);
+//				float v = dot(testDirection, sphere.m_ObjBiTangent);
+//
+//				if (u >  sphere.m_ObjUmin && u < sphere.m_ObjUmax && v > sphere.m_ObjVmin && v < sphere.m_ObjVmax)
+//				{
+//					renderdata.m_Rt = t;
+//					renderdata.m_RIndex = sphereIndex;
+//					renderdata.m_RHit = true;
+//					return;
+//				}
+//			}
+//		}
+//		//renderdata.m_RHit = false;
+//	}
 
 	renderdata.m_RHit = false;
 }
@@ -264,8 +264,9 @@ vec3 scatter(inout Ray ray, RenderData renderdata, inout float reflectance)
 	vec3 color = sphere.m_ObjMaterial.m_Albeido;
 
 	color = color * (1.0 - sphere.m_ObjMaterial.m_Roughness) * reflectance;
+	float localReflectance = sphere.m_ObjMaterial.m_Roughness;
 
-	reflectance = reflectance * sphere.m_ObjMaterial.m_Roughness;
+	reflectance = reflectance * localReflectance;
 
 	ray.RayOrigin = hitPos * 0.001;
     ray.RayDirection = normalize(reflect(ray.RayDirection, normal));

@@ -10,7 +10,7 @@ namespace KarhuRayTracer
 	class Camera
 	{
 	public:
-		Camera(std::vector<Shader>& shaders, Window& m_Window, glm::vec3 position, glm::vec3 eulers, float fov);
+		Camera(std::vector<Shader>& shaders, Window& m_Window,/*Input& input,*/ glm::vec3 position, glm::vec3 eulers, float fov);
 		~Camera();
 
 		void update(float deltatime);
@@ -21,9 +21,8 @@ namespace KarhuRayTracer
 		std::vector<Shader>& m_Shaders;
 		Window& m_Window;
 		glm::vec3 m_Position;    /* Cameras position. */
-		//glm::vec3 m_Target;      /* */
-		glm::vec3 m_Forward;     /* */
-		glm::vec3 m_Up = glm::vec3(0.0f,0.0f,1.0f);			 /* Points upwards in world space. */
+		glm::vec3 m_Forward;
+		glm::vec3 m_Up = glm::vec3(0.0f,1.0f,0.0f);			 /* Points upwards in world space. */
 		glm::vec3 m_CameraRight; /* Points Cameras positive x-axis. */
 		glm::vec3 m_CameraUp;	 /* Points Cameras positive y-axis. */
 		glm::vec3 m_Eulers;
@@ -36,7 +35,7 @@ namespace KarhuRayTracer
 		float m_Yaw;
 		float m_Pitch;
 
-		void MouseInput(float xoffset, float yoffset, bool constrainPitch = true);
+		void mouseTest();
 		void reCalculateProjection();
 		void reCalculateviewMatrix();
 	};

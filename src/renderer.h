@@ -21,7 +21,7 @@ namespace KarhuRayTracer
 		void update(float dt);
 		void rescaleFrameBuffer(float width, float height);
 
-		//unsigned int getFrameBuffer() { return fbotex; }
+		unsigned int getFrameBuffer() { return texture; }
 	private:
 		Window& m_Window;
 		

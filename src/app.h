@@ -41,10 +41,6 @@ namespace KarhuRayTracer
 
 		float m_DeltaTime = 0.0f;
 		float m_LastFrame = 0.0f;
-		glm::mat4 trans;
-		glm::mat4 m_Projection;
-		glm::mat4 m_Model = glm::mat4(1.0f);
-		glm::mat4 m_View = glm::mat4(1.0f);
 		unsigned int m_TextureID;
 	};
 }

@@ -31,12 +31,6 @@ namespace KarhuRayTracer
 	}
 	void ImguiManager::begin()
 	{
-		/*ImGuiViewport* viewport = ImGui::GetMainViewport();
-		ImGui::SetNextWindowPos(viewport->Pos);
-		ImGui::SetNextWindowSize(viewport->Size);
-		ImGui::SetNextWindowViewport(viewport->ID);
-		ImGuiID dockspaceId = ImGui::GetID("dockingWindow");
-		ImGui::DockSpace(dockspaceId, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_PassthruCentralNode);*/
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
@@ -56,9 +50,10 @@ namespace KarhuRayTracer
 	}
 	void ImguiManager::imguiRender(std::vector<Object>& objects, PointLight& light, float deltatime)
 	{
-		//dockSpace(open);
-		//viewport(open);
+		dockSpace(open);
+		viewport(open);
 		ObjectSettings(objects,light, deltatime);
+		helpBar();
 		ImGui::ShowDemoWindow(&show_demo_window);
 	}
 	void ImguiManager::dockSpace(bool& show)
@@ -98,11 +93,9 @@ namespace KarhuRayTracer
 		ImVec2 windowSize = viewportSize();
 		ImVec2 windowPos = centeredviewport(windowSize);
 
-		//ImGui::GetCursorPos()
-		//int textureId = m_Renderer.getFrameBuffer();
+		unsigned int textureId = m_Renderer.getFrameBuffer();
 		ImGui::SetCursorPos(windowPos);
-		//ImTextureID texId = m_Window.getFrameBuffer();
-		//ImGui::Image((void*)textureId, windowSize,ImVec2{0,1},ImVec2{1,0});
+		ImGui::Image((void*)textureId, windowSize,ImVec2{0,1},ImVec2{1,0});
 		ImGui::End();
 	}
 
@@ -129,18 +122,18 @@ namespace KarhuRayTracer
 		ImGui::End();
 	}
 
+	void ImguiManager::helpBar()
+	{
+		ImGui::Begin("Help Bar");
+		ImGui::Text("WASD to move.");
+		ImGui::Text("Hold right mouse button to rotate camera.");
+		ImGui::Text("Press esc to quit application. ");
+		ImGui::End();
+	}
+
 	ImVec2 ImguiManager::viewportSize()
 	{
 		m_ViewportSize = ImGui::GetContentRegionAvail();
-		/*windowSize.x -= ImGui::GetScrollX();
-		windowSize.y -= ImGui::GetScrollY();
-		float width = windowSize.x;
-		float height = width / ((float)m_Window.getWidth() / (float)m_Window.getHeight());
-		if (height > windowSize.y)
-		{
-			height = windowSize.y;
-			width = height * ((float)m_Window.getWidth() / (float)m_Window.getHeight());
-		}*/
 		return ImVec2(m_ViewportSize);
 	}
 	ImVec2 ImguiManager::centeredviewport(ImVec2 aspect)

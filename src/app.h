@@ -19,9 +19,9 @@ namespace KarhuRayTracer
 
 		void run();
 	private:
-		Window m_Window{ "Karhu RayTracer", 800, 600 };
+		Window m_Window{ "Karhu RayTracer", 1280, 720 };
 		std::vector<Shader> m_Shaders;
-		Camera m_Camera{ m_Shaders, m_Window, glm::vec3(-5.0f,0.0f,1.0), glm::vec3(0.0f,0.0f,1.0f), 45.0f };
+		Camera m_Camera{ m_Shaders, m_Window, glm::vec3(-5.0f,1.0f,0.0), glm::vec3(0.0f,1.0f,0.0f), 45.0f };
 		Renderer m_Renderer{ m_Window };
 		ImguiManager m_ImguiManager{ m_Window, m_Renderer };
 

@@ -25,7 +25,6 @@ namespace KarhuRayTracer
 		void pollEvents();
 		bool shouldClose();
 		void swapBuffers();
-		//void getFrameBuffer() { return glfwGetFramebufferSize(m_Window, (int*)m_Width, (int*)m_Height); }
 		const float getGlfwTime() const { return (float)glfwGetTime(); }
 		GLFWwindow* getContext() { return glfwGetCurrentContext(); }
 		GLFWwindow* getWindow() const { return m_Window; }

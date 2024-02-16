@@ -29,17 +29,12 @@ namespace KarhuRayTracer
 		glCreateBuffers(1, &m_VBO);
 		glCreateBuffers(1, &m_EBO);
 
-
 		glNamedBufferData(m_VBO, sizeof(vertices), vertices, GL_STATIC_DRAW);
-		
-
 		glNamedBufferData(m_EBO, sizeof(indices), indices, GL_STATIC_DRAW);
-		
 
 		glEnableVertexArrayAttrib(m_VAO, 0);
 		glVertexArrayAttribBinding(m_VAO, 0, 0);
 		glVertexArrayAttribFormat(m_VAO, 0, 3, GL_FLOAT, GL_FALSE, 0);
-		
 
 		glEnableVertexArrayAttrib(m_VAO, 1);
 		glVertexArrayAttribBinding(m_VAO, 1, 0);
@@ -48,13 +43,13 @@ namespace KarhuRayTracer
 		glVertexArrayVertexBuffer(m_VAO, 0, m_VBO, 0, 5 * sizeof(GLfloat));
 		glVertexArrayElementBuffer(m_VAO, m_EBO);
 
-		glCreateTextures(GL_TEXTURE_2D, 1, &texture);
-		glTextureParameteri(texture, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTextureParameteri(texture, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTextureParameteri(texture, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTextureParameteri(texture, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		glTextureStorage2D(texture, 1, GL_RGBA32F, m_Window.getWidth(), m_Window.getHeight());
-		glBindImageTexture(0, texture, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA32F);
+		glCreateTextures(GL_TEXTURE_2D, 1, &m_Texture);
+		glTextureParameteri(m_Texture, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTextureParameteri(m_Texture, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTextureParameteri(m_Texture, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTextureParameteri(m_Texture, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTextureStorage2D(m_Texture, 1, GL_RGBA32F, m_Window.getWidth(), m_Window.getHeight());
+		glBindImageTexture(0, m_Texture, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA32F);
 
 	}
 	Renderer::~Renderer()
@@ -73,10 +68,8 @@ namespace KarhuRayTracer
 		m_Camera.update(dt);
 		m_Shaders[0].use();
 		
-		glBindTextureUnit(0, texture);
+		glBindTextureUnit(0, m_Texture);
 		m_Shaders[0].setUniformTexture("screen", 0);
-		m_Shaders[0].setUniformMat4("view", m_Camera.getViewMatrix());
-		m_Shaders[0].setUniformMat4("projection", m_Camera.getProjectionMatrix());
 		glBindVertexArray(m_VAO);
 		glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(indices[0]), GL_UNSIGNED_INT, 0);
 	

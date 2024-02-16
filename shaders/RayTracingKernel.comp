@@ -67,7 +67,7 @@ uniform vec3 CameraPosition;
 uniform vec3 CameraForward;
 uniform vec3 CameraRight;
 uniform vec3 CameraUp;
-uniform Object u_Objects[2];
+uniform Object u_Objects[10];
 uniform PointLight u_PointLight;
 uniform Material u_Material;
 uniform samplerCube u_SkyBox;
@@ -134,28 +134,13 @@ RenderData RayCast(Ray ray)
 
 	for(int i = 0; i < u_Objects.length(); i++)
 	{
-		if(u_Objects[i].m_ObjType == 0)
-		{
 			hit(ray, i, ClosestT, m_RenderData);
 			if(m_RenderData.m_RHit)
 			{
 				ClosestT = m_RenderData.m_Rt;
 				hitOrnot = true;
 			}
-		}
 	}
-//	for(int i = 0; i < u_Objects.length(); i++)
-//	{
-//		if(u_Objects[i].m_ObjType == 1)
-//		{
-//			planeHit(u_Objects[i], ray, 0.001, ClosestT, m_RenderData);
-//			if(m_RenderData.m_RHit)
-//			{
-//				ClosestT = m_RenderData.m_Rt;
-//				hitOrnot = true;
-//			}
-//		}
-//	}
 
 	m_RenderData.m_RHit = hitOrnot;
 	return m_RenderData;
@@ -164,27 +149,59 @@ RenderData RayCast(Ray ray)
 void hit(Ray ray, int sphereIndex, in float t, inout RenderData renderdata)
 {
 	Object sphere = u_Objects[sphereIndex];
-	vec3 color = vec3(0.0);
-	vec3 o_c = ray.RayOrigin - sphere.m_ObjPosition;
-	float a = dot(ray.RayDirection, ray.RayDirection);
-	float b = 2 * dot(ray.RayDirection, o_c);
-	float c = dot(o_c, o_c) - sphere.m_ObjRadius * sphere.m_ObjRadius;
-	float intersectionState = b * b - 4 * a * c; //Quadratic formula discriminant.
-	if(intersectionState > 0)
+	if(sphere.m_ObjType == 0)
 	{
-		float tHit = (-b - sqrt(intersectionState)) / (2 * a); //Quadratic formula.
-		if(tHit < t && tHit > 0.0001)
+		//vec3 color = vec3(0.0);
+		vec3 o_c = ray.RayOrigin - sphere.m_ObjPosition;
+		float a = dot(ray.RayDirection, ray.RayDirection);
+		float b = 2 * dot(ray.RayDirection, o_c);
+		float c = dot(o_c, o_c) - sphere.m_ObjRadius * sphere.m_ObjRadius;
+		float intersectionState = b * b - 4 * a * c; //Quadratic formula discriminant.
+		if(intersectionState > 0)
 		{
+			float tHit = (-b - sqrt(intersectionState)) / (2 * a); //Quadratic formula.
+			if(tHit < t && tHit > 0.0001)
+			{
 				renderdata.m_Rt = tHit;
 				renderdata.m_RIndex = sphereIndex;
 				renderdata.m_RHit = true;
 				return;
+			}
 		}
+		//renderdata.m_RHit = false;
+	}
+	if(sphere.m_ObjType == 1)
+	{
+		float denom = dot(sphere.m_ObjNormal, ray.RayDirection); 
+		if (abs(denom) < 0.000001)
+		{ 
+			vec3 d = sphere.m_ObjPosition - ray.RayOrigin; 
+			float t = dot(d, sphere.m_ObjNormal) / denom;  
+    
+			if(t > 0.001 && t < 999999)
+			{
+				vec3 testPoint = ray.RayOrigin + t * ray.RayDirection;
+				vec3 testDirection = testPoint - sphere.m_ObjPosition;
+
+				float u = dot(testDirection, sphere.m_ObjTangent);
+				float v = dot(testDirection, sphere.m_ObjBiTangent);
+
+				if (u >  sphere.m_ObjUmin && u < sphere.m_ObjUmax && v > sphere.m_ObjVmin && v < sphere.m_ObjVmax)
+				{
+					renderdata.m_Rt = t;
+					renderdata.m_RIndex = sphereIndex;
+					renderdata.m_RHit = true;
+					return;
+				}
+			}
+		}
+		//renderdata.m_RHit = false;
 	}
 
 	renderdata.m_RHit = false;
 }
 
+// Doesnt work atm.
 void planeHit(Object plane, Ray ray, in float tMin, in float tMax, inout RenderData renderdata)
 {
 	float denom = dot(plane.m_ObjNormal, ray.RayDirection); 
@@ -215,7 +232,7 @@ void planeHit(Object plane, Ray ray, in float tMin, in float tMax, inout RenderD
 	renderdata.m_RHit = false;
 }
 
-
+// Doesnt work atm
 bool boxHit(Ray ray, Object object, inout float t)
 {
 	float t1 = -1000000000000.0;
@@ -245,7 +262,6 @@ vec3 scatter(inout Ray ray, RenderData renderdata, inout float reflectance)
 	vec3 normal = normalize(hitPos - sphere.m_ObjPosition);
 
 	vec3 color = sphere.m_ObjMaterial.m_Albeido;
-	//float localReflectance = sphere.m_ObjMaterial.m_Roughness;
 
 	color = color * (1.0 - sphere.m_ObjMaterial.m_Roughness) * reflectance;
 

@@ -4,14 +4,9 @@
 #include <stb_image.h>
 
 
-//m_Sphere.Center = vec3(3.0, 0.0, 0.0);
-//m_Sphere.Radius = 1.0;
-//m_Sphere.Colour = vec3(1.0, 0.75, 0.5);
 
 namespace KarhuRayTracer
 {
-	Material m_Material;
-	extern Object m_Object;
 
 	CubeMaterial::CubeMaterial()
 	{
@@ -53,7 +48,7 @@ namespace KarhuRayTracer
 		return textureID;
 	}
 
-	/* This is rather dumb way to set data for shaders. Better way would be to use uniform buffers. */
+	/* This is rather dumb way to send data for shaders. Better way would be to use uniform buffers. */
 	void bind(Shader& m_Shader, std::vector<Object> objects, PointLight light, unsigned int TextureID)
 	{
 		for (int i = 0; i < objects.size(); i++)
@@ -80,7 +75,7 @@ namespace KarhuRayTracer
 		m_Shader.setCUniformVec3("u_PointLight.m_LightPosition", light.m_Position);
 		m_Shader.setCUniformVec3("u_PointLight.m_LightColor", light.m_Color);
 		m_Shader.setCUniformfloat("u_PointLight.m_LightRadius", light.m_Radius);
-		m_Shader.setCUniformInt("u_SkyBox", TextureID);
+		m_Shader.setUniformInt("u_SkyBox", TextureID);
 	}
 	
 }

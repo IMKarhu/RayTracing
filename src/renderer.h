@@ -1,36 +1,28 @@
 #pragma once
 #include "gameObject.h"
-#include "frameBuffer.h"
-#include "texture.h"
-//#include "skyboxData.h"
 #include <vector>
-#include <memory>
 
 namespace KarhuRayTracer
 {
 	class Window;
 	class Shader;
 	class Camera;
+
 	class Renderer
 	{
 	public:
 		Renderer(Window& window);
 		~Renderer();
 
-		void render(std::vector<Shader>& m_Shaders, Camera& m_Camera,std::vector<Object> objects, PointLight& light, float dt);
-		void update(float dt);
-		void rescaleFrameBuffer(float width, float height);
+		void render(std::vector<Shader>& shaders, Camera& camera, std::vector<Object> objects, PointLight& light, unsigned int textureID, float dt);
 
-		//unsigned int getFrameBuffer() { return fbotex; }
+		unsigned int getTexture() { return m_Texture; }
 	private:
 		Window& m_Window;
 		
-		//Texture m_SkyBoxTexture{};
-		//FrameBuffer m_FrameBuffer{};
 		unsigned int m_VAO;
 		unsigned int m_VBO; /* Vertex buffer object. */
 		unsigned int m_EBO; /* Element buffer object. */
-		unsigned int ssbo;
-		unsigned int texture;
+		unsigned int m_Texture;
 	};
 }

@@ -171,6 +171,16 @@ namespace KarhuRayTracer
 		glUniform1i(location, value);
 	}
 
+	void Shader::setUniformInt(const std::string& name, const int& value)
+	{
+		int location = glGetUniformLocation(m_ShaderProgram, name.c_str());
+		if (location < 0)
+		{
+			return;
+		}
+		glUniform1i(location, value);
+	}
+
 	void Shader::setCUniformVec3(const std::string& name, const glm::vec3& vec3)
 	{
 		int location = glGetUniformLocation(m_ComputeProgram, name.c_str());
@@ -191,7 +201,7 @@ namespace KarhuRayTracer
 	}
 	void Shader::setCUniformInt(const std::string& name, const int& value)
 	{
-		int location = glGetUniformLocation(m_ShaderProgram, name.c_str());
+		int location = glGetUniformLocation(m_ComputeProgram, name.c_str());
 		if (location < 0)
 		{
 			return;

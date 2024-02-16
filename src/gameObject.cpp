@@ -1,19 +1,55 @@
 #include "gameObject.h"
 #include "shader.h"
 #include <glad.h>
-#include <string>
+#include <stb_image.h>
 
 
-//m_Sphere.Center = vec3(3.0, 0.0, 0.0);
-//m_Sphere.Radius = 1.0;
-//m_Sphere.Colour = vec3(1.0, 0.75, 0.5);
 
 namespace KarhuRayTracer
 {
-	Material m_Material;
-	extern Object m_Object;
 
-	void bind(Shader& m_Shader, std::vector<Object> objects, PointLight light)
+	CubeMaterial::CubeMaterial()
+	{
+		
+	}
+	CubeMaterial::~CubeMaterial()
+	{
+	}
+
+	unsigned int CubeMaterial::createCubeMap(std::vector<std::string> faces)
+	{
+		unsigned int textureID;
+		glGenTextures(1, &textureID);
+
+		glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+
+		int width, height, nrChannels;
+		for (int i = 0; i < faces.size(); i++)
+		{
+			unsigned char* data = stbi_load(faces[i].c_str(), &width, &height, &nrChannels, 0);
+			if (data)
+			{
+				glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+					0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data
+				);
+				stbi_image_free(data);
+			}
+			else
+			{
+				std::cout << "Cubemap tex failed to load at path: " << faces[i] << std::endl;
+				stbi_image_free(data);
+			}
+		}
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		return textureID;
+	}
+
+	/* This is rather dumb way to send data for shaders. Better way would be to use uniform buffers. */
+	void bind(Shader& m_Shader, std::vector<Object> objects, PointLight light, unsigned int TextureID)
 	{
 		for (int i = 0; i < objects.size(); i++)
 		{
@@ -39,5 +75,7 @@ namespace KarhuRayTracer
 		m_Shader.setCUniformVec3("u_PointLight.m_LightPosition", light.m_Position);
 		m_Shader.setCUniformVec3("u_PointLight.m_LightColor", light.m_Color);
 		m_Shader.setCUniformfloat("u_PointLight.m_LightRadius", light.m_Radius);
+		m_Shader.setUniformInt("u_SkyBox", TextureID);
 	}
+	
 }

@@ -17,6 +17,7 @@ namespace KarhuRayTracer
 		void setUniformVec4(const std::string& name, const glm::vec4& vec4);
 		void setUniformMat4(const std::string& name, const glm::mat4& mat4);
 		void setUniformTexture(const std::string& name, int value);
+		void setUniformInt(const std::string& name, const int& value);
 
 		/* Compute. */
 		void setCUniformVec3(const std::string& name, const glm::vec3& vec3);

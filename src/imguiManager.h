@@ -24,6 +24,7 @@ namespace KarhuRayTracer
 		void dockSpace(bool &show);
 		void viewport(bool& show);
 		void ObjectSettings(std::vector<Object>& objects, PointLight& light, float deltatime);
+		void helpBar();
 		ImVec2 viewportSize();
 		ImVec2 centeredviewport(ImVec2 aspect);
 	private:

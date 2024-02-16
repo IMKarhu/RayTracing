@@ -120,9 +120,6 @@ void main()
 			break;
 		}
 	}
-////				m_Ray.RayOrigin = hit_pos + normal * 0.0001; //Need to offset origin by very small amount so we dont hit our sphere we're trying to bounce off of.
-////				m_Ray.RayDirection = reflect(m_Ray.RayDirection, normal); // reflect() I - 2.0 * dot(N, I) * N from khronos reference page.
-
 
 	imageStore(screen, pixel_coords, vec4(color, 1.0));
 }
@@ -167,8 +164,6 @@ RenderData RayCast(Ray ray)
 void hit(Ray ray, int sphereIndex, in float t, inout RenderData renderdata)
 {
 	Object sphere = u_Objects[sphereIndex];
-	int bounces = 2;
-	float multiplier = 1.0;
 	vec3 color = vec3(0.0);
 	vec3 o_c = ray.RayOrigin - sphere.m_ObjPosition;
 	float a = dot(ray.RayDirection, ray.RayDirection);
@@ -250,13 +245,13 @@ vec3 scatter(inout Ray ray, RenderData renderdata, inout float reflectance)
 	vec3 normal = normalize(hitPos - sphere.m_ObjPosition);
 
 	vec3 color = sphere.m_ObjMaterial.m_Albeido;
-	float localReflectance = sphere.m_ObjMaterial.m_Roughness;
+	//float localReflectance = sphere.m_ObjMaterial.m_Roughness;
 
-	color = color * (1.0 - localReflectance) * reflectance;
+	color = color * (1.0 - sphere.m_ObjMaterial.m_Roughness) * reflectance;
 
-	reflectance = reflectance * localReflectance;
+	reflectance = reflectance * sphere.m_ObjMaterial.m_Roughness;
 
-	ray.RayOrigin = hitPos;
+	ray.RayOrigin = hitPos * 0.001;
     ray.RayDirection = normalize(reflect(ray.RayDirection, normal));
 	return color;
 }

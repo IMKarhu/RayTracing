@@ -5,9 +5,6 @@ layout (location = 1) in vec2 inUV;
 
 out vec2 outUV;
 
-uniform mat4 projection;
-uniform mat4 view;
-
 void main()
 {
 	gl_Position = vec4(inPosition, 1.0);

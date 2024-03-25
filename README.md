@@ -1,4 +1,4 @@
-# RayTracer_ProjectStudies
+# Simple RayTracer
 
 Simple Raytracer using compute shader in openGL
 
